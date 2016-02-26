@@ -1,0 +1,650 @@
+<script type="text/template" id="configproduct-grid-single">
+    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td><%- id %></td>
+    <td><%- type %></td>
+    <td><%- name %></td>
+    <td><%- sku %></td>
+    <td><%- price %></td>
+    <td><%- qty %></td>
+</script>
+
+<script type="text/html" id="configproduct-pagination-template">
+    <% if (currentPage != 1) { %>
+    <button class="prev btn-default btn">Prev</button>
+    <% } %>
+
+    <label for="page">Page</label>
+    <input type="number" value="<%= currentPage %>" name="page" id="configproduct-page" class="number"> of <%= totalPages %>
+
+    <% if (lastPage != currentPage && lastPage != 0) { %>
+    <button class="btn btn-default next">Next</button>
+    <% } %>
+</script>
+
+<script type="text/html" id="configproduct-grid-adv-filter">
+    <div class="filter">
+        <label>Filter</label>
+        <select name="filter_field[<%= counter %>]" class="adv-filter-field">
+            <% _.each(fields, function(field) { %>
+            <option value="<%= field.code %>" data-type="<%= field.type %>"
+            <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
+            <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
+            <% }); %>
+        </select>
+
+        <select name="filter_op[<%= counter %>]" class="adv-filter-op">
+            <% _.each(ops, function(op) { %>
+            <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
+            <% }); %>
+        </select>
+
+        <% if (choices.length > 0) { %>
+        <select name="filter_val[<%= counter %>]" class="adv-filter-input">
+            <% _.each(choices, function(option) { %>
+            <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
+            <% }); %>
+        </select>
+        <% } else { %>
+        <input name="filter_val[<%= counter %>]" type="text" class="adv-filter-input" value="<%= value %>" />
+        <% } %>
+
+        <% if (remove) { %>
+        <a href="javascript:;" class="remove-filter"><i class="fa fa-times fa-lg"></i></a>
+        <% } else { %>
+        <a href="javascript:;" class="add-filter"><i class="fa fa-plus fa-fw fa-lg"></i></a>
+        <% } %>
+    </div>
+</script>
+
+<script type="text/javascript">
+
+App.ConfigProduct = {};
+App.ConfigProduct.models = {};
+App.ConfigProduct.collections = {};
+App.ConfigProduct.collections.dynamic = {};
+App.ConfigProduct.views = {};
+App.ConfigProduct.views.dynamic = {};
+
+
+// Sortable
+App.ConfigProduct.models.Sortable = Backbone.Model.extend({});
+App.ConfigProduct.collections.SortableCollection = Backbone.Collection.extend({
+    model: App.ConfigProduct.models.Sortable
+});
+
+// AdvFilter
+App.ConfigProduct.models.AdvFilter = Backbone.Model.extend({});
+App.ConfigProduct.collections.AdvFilterCollection = Backbone.Collection.extend({
+    model: App.ConfigProduct.models.AdvFilter
+});
+
+// Products
+App.ConfigProduct.models.Product = Backbone.Model.extend({});
+App.ConfigProduct.collections.PaginatedCollection = Backbone.PageableCollection.extend({
+    key: '',
+    url: App.serverURL + 'admin/product/',
+    mode: 'server',
+    model: App.ConfigProduct.models.Product,
+    state: {
+        pageSize: 30,
+        sortKey: 'name',
+        order: 1,
+        currentPage: 1,
+        totalPages: null,
+        totalRecords: null
+    },
+    queryParams: {
+        sortKey: 'sort',
+        order: 'direction',
+        directions: {
+            "-1": 'asc',
+            "1": 'desc'
+        },
+        currentPage: 'page',
+        format: 'json'
+    },
+    parse: function(fullResponse) {
+
+        var response = fullResponse.result;
+        var search = fullResponse.search;
+
+        // Set state
+        this.state.totalRecords = parseInt(response.total);
+        this.state.totalPages = parseInt(response.pages);
+
+        // handle table header sorting
+        if (typeof(App.ConfigProduct.views.sorting) === 'undefined' ||
+                App.ConfigProduct.views.sorting === null ||
+                typeof(App.ConfigProduct.collections.sorting) === 'undefined') {
+
+            App.ConfigProduct.collections.sorting = new App.ConfigProduct.collections.SortableCollection(search.sortable);
+
+            App.ConfigProduct.views.sorting = new App.ConfigProduct.views.TableHeading({
+                collection: App.ConfigProduct.collections.sorting,
+                el: App.ConfigProduct.Container.find('table thead.grid-header')
+            });
+
+            App.ConfigProduct.views.sorting.render(); // view should be changing based on model changes
+        } else {
+            App.ConfigProduct.collections.sorting.reset(search.sortable);
+        }
+
+        // handle adv. filters
+        if (typeof(App.ConfigProduct.views.advfilters) === 'undefined' ||
+                App.ConfigProduct.views.advfilters === null ||
+                typeof(App.ConfigProduct.collections.advfilters) === 'undefined') {
+
+            App.ConfigProduct.collections.advfilters = new App.ConfigProduct.collections.AdvFilterCollection(search.advFilters);
+
+            App.ConfigProduct.views.advfilters = new App.ConfigProduct.views.GridFilterView({
+                collection: App.ConfigProduct.collections.advfilters,
+                el: App.ConfigProduct.Container.find('div#configproducts-filters-container')
+            });
+
+            App.ConfigProduct.views.advfilters.ops = search.advFilterOps; // [{code:'gt',label:'Greater Than',types:["number","date"]},..]
+            App.ConfigProduct.views.advfilters.filterable = search.filterable;
+            App.ConfigProduct.views.advfilters.render(); // view should be changing based on model changes
+        } else {
+            App.ConfigProduct.collections.advfilters.reset(search.advFilters);
+        }
+
+        // Render Faceted Search
+        //App.ConfigProduct.collections.facets = new App.ConfigProduct.collections.FacetCollection(response.facetCounts);
+        //App.ConfigProduct.views.facets = new App.ConfigProduct.views.FacetCollectionView({collection: App.ConfigProduct.collections.facets});
+        //App.ConfigProduct.views.facets.render();
+
+        return response.entities;
+    }
+});
+
+//View for product listing
+App.ConfigProduct.views.ProductList = Backbone.View.extend({
+    el : '.product-list',
+    selected: [],
+    initialize: function() {
+        var products = this.collection;
+        products.on('add', this.addOne, this);
+        this.render();
+    },
+    render: function() {
+        this.$el.html('');
+        return this;
+    },
+    addOne: function(product) {
+        var view = new App.ConfigProduct.views.ProductView({ model: product });
+        view.selected = this.selected;
+        this.$el.append(view.render().el);
+        return this;
+    }
+});
+
+App.ConfigProduct.views.ProductView = Backbone.View.extend({
+    tagName: 'tr',
+    className: 'item-grid',
+    selected: [],
+    events: {
+        'click input.select-product': 'productClick'
+    },
+    template: _.template($('#configproduct-grid-single').html()),
+    initialize: function() {
+        this.model.bind('change', this.render, this);
+        this.model.bind('remove', this.remove, this);
+    },
+    render: function() {
+        var self = this;
+        var product = this.model.toJSON();
+        var productId = product.id;
+
+        if (self.selected.indexOf(productId) > -1) {
+            product.checked = 1;
+        } else {
+            product.checked = 0;
+        }
+
+        this.$el.html(this.template(product));
+        return this;
+    },
+    productClick: function(e) {
+        var product = this.model;
+        var self = this;
+
+        var link = $(e.currentTarget);
+        var idStr = link.attr('id');
+        var idParts = idStr.split('-');
+        var id = idParts[1];
+        var checkbox = $('input#child-id-' + id);
+        
+        if (checkbox.length > 0) {
+            checkbox.parent().remove();
+        } else {
+            var panel = App.ConfigProduct.Container.find('table tbody.child-product-list');
+            var html = '<tr>';
+            html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="config_ids['+product.get('id')+']" id="child-id-'+product.get('id')+'"></td>';
+            html += '<td>' + product.get('id') + '</td>';
+            html += '<td>' + product.get('type') + '</td>';
+            html += '<td>' + product.get('name') + '</td>';
+            html += '<td>' + product.get('sku') + '</td>';
+            html += '<td>' + product.get('price') + '</td>';
+            html += '<td>' + product.get('qty') + '</td>';
+            html += '</tr>';
+            panel.append(html);
+        }
+    }
+});
+
+App.ConfigProduct.views.GridFilterView = Backbone.View.extend({
+    filterable: [],
+    ops: [],
+    count: 0,
+    el: '',
+    tagName: 'div',
+    className: 'filter',
+    events: {
+        'click a.add-filter': 'addFilter',
+        'click a.remove-filter': 'removeFilter',
+        'change select.adv-filter-field': 'changeFilter'
+    },
+    template: _.template($('#configproduct-grid-adv-filter').html()),
+    initialize: function() {
+        var products = this.collection;
+        products.on('reset', this.render, this);
+    },
+    render: function() {
+        var self = this;
+        this.$el.html('');
+
+        this.collection.each(function(filter){
+            self.renderFilter(filter);
+        });
+
+        this.renderFilter({
+            field:'id',
+            op:'equals',
+            value:'',
+            type:'number',
+            choices: []
+        });
+
+        return this;
+    },
+    changeFilter: function(e) {
+        var self = this;
+        var select = $(e.currentTarget);
+        var field = select.find(':selected');
+        var type = field.attr('data-type');
+        var filterOps = select.parent().find('select.adv-filter-op');
+        filterOps.html('');
+        for(var x=0; x < self.ops.length; x++) {
+            var op = self.ops[x];
+            if (op.types.indexOf(type) > -1) {
+                filterOps.append('<option value="' + op.code + '"' + " data-types='{" + '"types":' + JSON.stringify(op.types) +"}'"+'>'+op.label+'</option>');
+            }
+        }
+
+        // change filter input type as necessary
+        var choiceJson = field.attr('data-choices');
+        if (!_.isUndefined(choiceJson)) {
+            // render select input, remove text input if necessary
+            var inputEl = select.parent().find('select.adv-filter-input');
+            if (inputEl.length) {
+
+                inputEl.html('');
+                var optionStr = '';
+                var choiceContainer = JSON.parse(choiceJson);
+                var choices = choiceContainer.choices;
+                for (var x=0;x<choices.length;x++) {
+                    var choice = choices[x];
+                    optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
+                }
+
+                inputEl.html(optionStr);
+
+            } else {
+                inputEl = select.parent().find('input.adv-filter-input');
+                if (_.isObject(inputEl)) {
+
+                    var optionStr = '';
+                    var choiceContainer = JSON.parse(choiceJson);
+                    var choices = choiceContainer.choices;
+                    for (var x=0;x<choices.length;x++) {
+                        var choice = choices[x];
+                        optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
+                    }
+
+                    var inputName = inputEl.attr('name');
+                    $('<select name="' + inputName + '" class="adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
+                    inputEl.remove();
+                }
+            }
+
+        } else {
+            // render text input, remove select input if necessary
+            var inputEl = select.parent().find('input.adv-filter-input');
+            if (!inputEl.length) {
+                inputEl = select.parent().find('select.adv-filter-input');
+                if (_.isObject(inputEl)) {
+                    var inputName = inputEl.attr('name');
+                    $('<input type="text" class="adv-filter-input" name="' + inputName + '" value="" />').insertAfter(inputEl);
+                    inputEl.remove();
+                }
+            }
+        }
+
+        return this;
+    },
+    renderFilter: function(filter) {
+        this.count++;
+
+        var type = '';
+        var ops = [];
+        var fields = [];
+        var value = '';
+        var remove = false;
+        var choices = [];
+
+        // if it's a model object
+        if (!_.isUndefined(filter.attributes)) {
+            for(var x=0; x < this.filterable.length; x++) {
+                var field = this.filterable[x];
+                if (field.code == filter.get('field')) {
+                    type = field.type;
+                    field.selected = 1;
+                    if (!_.isUndefined(filter.get('choices'))) {
+                        choices = filter.get('choices');
+                    }
+                }
+                fields.push(field);
+            }
+
+            for(x=0; x < this.ops.length; x++) {
+                var op = this.ops[x];
+                if (op.types.indexOf(type) > -1) {
+                    if (filter.get('op') == op.code) {
+                        op.selected = 1;
+                    }
+                    ops.push(op);
+                }
+            }
+
+            value = filter.get('value');
+            remove = true;
+
+        } else if (!_.isUndefined(filter.type)) {
+            //else if it's a standard js object
+
+            for(var x=0; x < this.filterable.length; x++) {
+                var field = this.filterable[x];
+                if (_.isUndefined(filter.field) && field.code == 'id') {
+                    field.selected = 1;
+                }
+                fields.push(field);
+            }
+
+            for(var x=0; x < this.ops.length; x++) {
+                var op = this.ops[x];
+                if (op.types.indexOf(filter.type) > -1) {
+                    ops.push(op);
+                }
+            }
+        } else {
+            ops = this.ops;
+            fields = this.filterable;
+        }
+
+        this.$el.append(this.template({
+            fields: fields,
+            ops: ops,
+            counter: this.count,
+            value: value,
+            remove: remove,
+            choices: choices
+        }));
+
+        // Cleanup, remove selected flag
+        for(x=0; x < this.ops.length; x++) {
+            var op = this.ops[x];
+            if (!_.isUndefined(op.selected)) {
+                delete op.selected;
+            }
+        }
+
+        // Cleanup, remove selected flag
+        for(var x=0; x < this.filterable.length; x++) {
+            var field = this.filterable[x];
+            if (!_.isUndefined(field.selected)) {
+                delete field.selected;
+            }
+        }
+
+        return this;
+    },
+    addFilter: function(e) {
+        e.preventDefault();
+        this.count++;
+        var link = $(e.currentTarget);
+        link.removeClass('add-filter');
+        link.addClass('remove-filter');
+        link.html('<i class="fa fa-times fa-lg"></i>');
+        var choices = [];
+
+        var ops = [];
+        for(var x=0; x < this.ops.length; x++) {
+            var op = this.ops[x];
+            //assuming ID is first on the list
+            if (op.types.indexOf('number') > -1) {
+                ops.push(op);
+            }
+        }
+
+        this.$el.append(this.template({
+            fields: this.filterable,
+            ops: ops,
+            counter: this.count,
+            value: '',
+            remove: false,
+            choices: choices
+        }));
+
+        return this;
+    },
+    removeFilter: function(e) {
+        e.preventDefault();
+        var link = $(e.currentTarget);
+        link.parent().remove();
+        return this;
+    }
+});
+
+App.ConfigProduct.views.TableButtons = Backbone.View.extend({
+    el : 'div.adv-filter-buttons',
+    tagName: 'div',
+    className: 'pull-right',
+    events: {
+        'click button.adv-filters-search': 'updateSearch'
+    },
+    initialize: function() {
+
+    },
+    updateSearch: function (e) {
+        e.preventDefault();
+
+        // filter fields
+        App.ConfigProduct.collections.products.queryParams.filter_field = [];
+        App.ConfigProduct.Container.find('select.adv-filter-field').each(function(){
+            var self = $(this);
+            App.ConfigProduct.collections.products.queryParams.filter_field.push(self.val());
+        });
+
+        // filter operations
+        App.ConfigProduct.collections.products.queryParams.filter_op = [];
+        App.ConfigProduct.Container.find('select.adv-filter-op').each(function(){
+            var self = $(this);
+            App.ConfigProduct.collections.products.queryParams.filter_op.push(self.val());
+        });
+
+        // filter values
+        App.ConfigProduct.collections.products.queryParams.filter_val = [];
+        App.ConfigProduct.Container.find('.adv-filter-input').each(function(){
+            var self = $(this);
+            App.ConfigProduct.collections.products.queryParams.filter_val.push(self.val());
+        });
+
+        App.ConfigProduct.collections.products.currentPage = 1;
+        App.ConfigProduct.collections.products.fetch();
+
+        return false;
+    }
+});
+
+App.ConfigProduct.views.TableHeading = Backbone.View.extend({
+    el : 'table thead.grid-header',
+    tagName: 'tr',
+    columns: ['id','type','name','sku','price','qty'],
+    events: {
+        'click th': 'gotoPage',
+        'click button.adv-filters-search': 'updateSearch'
+    },
+    initialize: function() {
+        var cells = this.collection;
+        cells.on('all', this.render, this);
+        //this.render(); // cannot render in initialize, since we're handling the key
+    },
+    render: function() {
+        var self = this;
+        this.$el.html('');
+
+        var html = '';
+        html += '<th><input type="checkbox" value="1" name="product_check_all"></th>';
+
+        this.collection.each(function(cell) {
+            if (self.columns.indexOf(cell.get('code')) >= 0) {
+
+                var className = 'sorting';
+                if (cell.get('isActive') == 1) {
+                    if (cell.get('direction') == 'desc') {
+                        className = 'sorting_desc';
+                    } else {
+                        className = 'sorting_asc';
+                    }
+                }
+
+                html += '<th class="'+ className +'" data-sort="' + cell.get('code') + '">' + cell.get('label') + '</th>';
+            }
+        });
+
+        this.$el.html('<tr>' + html + '</tr>');
+        return this;
+    },
+    gotoPage: function(event) {
+        var link = $(event.currentTarget);
+        var sort = link.attr('data-sort');
+        var sortDir = '1';
+        if (link.hasClass('sorting_desc')) {
+            sortDir = '-1';
+            link.removeClass('sorting_desc');
+            link.addClass('sorting_asc');
+        } else {
+            link.removeClass('sorting_asc');
+            link.addClass('sorting_desc');
+        }
+
+        App.ConfigProduct.collections.products.state.sortKey = sort;
+        App.ConfigProduct.collections.products.state.order = sortDir;
+        App.ConfigProduct.collections.products.state.currentPage = 1;
+        App.ConfigProduct.collections.products.fetch();
+
+        return true;
+    }
+});
+
+App.ConfigProduct.views.PaginatedView = Backbone.View.extend({
+    el: '',
+    tagName: 'div',
+    className: 'pull-left',
+    events: {
+        'click button.prev': 'gotoPrev',
+        'click button.next': 'gotoNext',
+        'click a.page': 'gotoPage'
+    },
+    template: _.template($('#configproduct-pagination-template').html()),
+    initialize: function() {
+        this.collection.on('reset', this.render, this);
+        this.collection.on('sync', this.render, this);
+        this.render();
+    },
+    render: function() {
+        this.$el.html(this.template(this.collection.state));
+        return this;
+    },
+    gotoPrev: function(e) {
+        e.preventDefault();
+        this.collection.getPreviousPage();
+        return this;
+    },
+    gotoNext: function(e) {
+        e.preventDefault();
+        this.collection.getNextPage();
+        return this;
+    },
+    gotoPage: function(e) {
+        e.preventDefault();
+        var page = $(e.target).text();
+        this.collection.getPage(parseInt(page));
+        return this;
+    }
+});
+
+</script>
+
+<script type="text/javascript">
+$(function(){
+
+    // for populating backbonejs properties
+    var key = '{{ section_id }}';
+    App.ConfigProduct.Container = $('#'+key);
+
+    // product model collection
+    App.ConfigProduct.collections.products = new App.ConfigProduct.collections.PaginatedCollection({
+        url: App.ConfigProduct.serverURL + '/admin/product/'
+    });
+
+    // product listing view, for all products
+    App.ConfigProduct.views.products = new App.ConfigProduct.views.ProductList({
+        collection: App.ConfigProduct.collections.products,
+        el: App.ConfigProduct.Container.find('.product-list')
+    });
+    App.ConfigProduct.views.products.selected = {{ child_ids|json_encode()|raw }};
+
+    // pager controls
+    App.ConfigProduct.views.pager = new App.ConfigProduct.views.PaginatedView({
+        collection: App.ConfigProduct.collections.products,
+        el: App.ConfigProduct.Container.find('div.grid-pager')
+    });
+
+    // grid buttons
+    App.ConfigProduct.views.advfilters = new App.ConfigProduct.views.TableButtons({
+        el: App.ConfigProduct.Container.find('div.adv-filters-buttons')
+    });
+
+    // fetch product collection and trigger views
+    App.ConfigProduct.collections.products.fetch();
+
+    // todo:
+    // getters for is_in_stock without .isinstock (getter defined)
+    //  could use wrapper
+    // column configuration
+    //  can display, but not sort
+    // join / sort attribute values (left join)
+    //  can display, but not sort
+    // default filters eg product type
+    //  can enforce at widget level
+    //  or just hardcode into bbjs paginator
+    // saved searches
+    // php form handler (backend, obviously), use observers
+    // DONE: header cell format
+    // DONE: adv. filters options
+
+    // back to products link
+    // pager buttons, improve if possible
+});
+</script>

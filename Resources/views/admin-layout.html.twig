@@ -1,0 +1,148 @@
+{% extends 'MobileCartAdminBundle::base.html.twig' %}
+
+{% block stylesheets %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ asset('bundles/mobilecartadmin/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/mobilecartadmin/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/mobilecartadmin/css/styles.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        window.App = {};
+        App.collections = {};
+        App.collections.dynamic = {};
+        App.models = {};
+        App.views = {};
+        App.views.dynamic = {};
+        App.serverURL = '{{ path('_home') }}';
+    </script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/json2.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/jquery-1.11.0.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/spin.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/underscore.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/backbone-min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/backbone.localStorage.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/backbone.paginator.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/selectize.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartadmin/js/global.js') }}"></script>
+
+{% endblock %}
+
+{% block body %}
+
+{% block topnav %}
+
+<header>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        {% block navigation %}
+        <div class="collapse navbar-collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ path('cart_home') }}">Home</a></li>
+                <li><a href="{{ path('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+        {% endblock %}
+    </nav>
+</header>
+
+{% endblock %}
+{% block admin_menu %}
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar sidebar-collapse">
+        <ul class="nav" id="side-menu">
+
+            <li>
+                <a href="{{ path('cart_admin_dashboard') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+            </li>
+
+            {% block admin_menu_list %}
+
+            <li>
+                <a href="#"><i class="glyphicon glyphicon-shopping-cart icon-white"></i> Catalog<span class="fa arrow fa-rotate-180"></span></a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ path('cart_admin_product') }}">Products</a></li>
+                    <li><a href="{{ path('cart_admin_category') }}">Categories</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Sales<span class="fa arrow fa-rotate-180"></span></a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ path('cart_admin_order') }}">Orders</a></li>
+                    <li><a href="{{ path('cart_admin_customer') }}">Customers</a></li>
+                    <li><a href="{{ path('cart_admin_discount') }}">Discounts</a></li>
+                    <li><a href="{{ path('cart_admin_shipping_method') }}">Shipping Method</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow fa-rotate-180"></span></a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ path('cart_admin_content') }}">Content</a></li>
+                    <li><a href="{{ path('cart_admin_url_rewrite') }}">URL Rewrites</a></li>
+                </ul>
+                <!-- /.nav-second-level -->
+            </li>
+
+            <li>
+                <a href="#"><i class="fa fa-sitemap fa-fw"></i> EAV Manager<span class="fa arrow fa-rotate-180"></span></a>
+                <ul class="nav nav-second-level">
+                    <li><a href="{{ path('cart_admin_item_var_set') }}">Variant Sets</a></li>
+                    <li><a href="{{ path('cart_admin_item_var') }}">Variants</a></li>
+                    <li>
+                        <a href="#">Variant Options <span class="fa arrow fa-rotate-180"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'datetime'}) }}">Datetime</a></li>
+                            <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'decimal'}) }}">Decimal</a></li>
+                            <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'integer'}) }}">Integer</a></li>
+                            <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'text'}) }}">Text</a></li>
+                            <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'varchar'}) }}">Varchar</a></li>
+                        </ul>
+                        <!-- /.nav-third-level -->
+                    </li>
+                </ul>
+                <!-- /.nav-second-level -->
+            </li>
+            {% endblock %}
+
+        </ul>
+        <!-- /#side-menu -->
+    </div>
+    <!-- /.sidebar-collapse -->
+</nav>
+<!-- /.navbar-static-side -->
+{% endblock %}
+
+<div id="page-wrapper">
+{% for state in ['info', 'warning', 'success', 'danger'] %}
+    {% for flashMessage in app.session.flashbag.get(state) %}
+        <div class="alert alert-{{ state }} alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+    <div class="row">
+        {% block content %}
+        <h1 class="page-header">Blank</h1>
+        {% endblock %}
+    </div>
+    <!-- /.row -->
+</div>
+<!-- /#page-wrapper -->
+
+
+{% endblock %}

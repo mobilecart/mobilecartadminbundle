@@ -1,0 +1,54 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+
+{% block content %}
+<div class="col-lg-6">
+    <form action="{{ path('admin_discount_edit', { 'id': entity.id }) }}" method="post" {{ form_enctype(form) }}>
+        {{ form_widget(form) }}
+        <p>
+            <button type="submit" id="builder-submit">Save</button>
+        </p>
+    </form>
+</div>
+
+<div>
+    <a class="builder-serialize" href="#">Serialize</a>
+</div>
+
+<div id="debug-condition"></div>
+<div id="debug-target"></div>
+
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/mobilecartadmin/css/discount.css') }}" rel="stylesheet">
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/discountWidget.js') }}"></script>
+    <script type="text/javascript">
+        $(function(){
+
+            widget = discountWidget.initialize({
+                containerEl: $('{{ container }}'),
+                targetInput: $('{{ target_input }}'),
+                conditionInput: $('{{ condition_input }}'),
+                operators: {{ operators_json|raw }},
+                logicalOperators: {{ logical_operators_json|raw }},
+                varSets: {{ var_sets|raw }}
+            });
+
+            // @TODO : move this to attachEvents
+            $('#builder-submit').click(function(e) {
+                widget.serialize();
+                return true;
+            });
+
+            $('a.builder-serialize').click(function(e) {
+                e.preventDefault();
+                $('#debug-condition').html('<pre>' + widget.getConditionText() + '</pre>');
+                $('#debug-target').html('<pre>' + widget.getActionText() + '</pre>');
+            });
+
+        });
+    </script>
+{% endblock %}

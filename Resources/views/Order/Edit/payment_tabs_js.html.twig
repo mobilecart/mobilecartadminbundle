@@ -1,0 +1,16 @@
+
+<script type="text/javascript">
+
+$(function() {
+
+    // handle radio inputs; show and hide sub-forms
+
+    $('div#section-add-payment input.payment-option-input').click(function() {
+        var self = $(this);
+        $('div#section-add-payment div.payment-option-form').hide();
+        self.parent().parent().find('div.payment-option-form').show();
+    });
+
+});
+
+</script>

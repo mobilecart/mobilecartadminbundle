@@ -1,0 +1,54 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+{% form_theme init_form 'bootstrap_3_layout.html.twig' %}
+
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_product') }}"><i class="fa arrow"></i> Back to Products</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h1 class="page-header">Create Product</h1>
+        </div>
+    </div>
+
+    <div class="row product-init">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h4>Initialize Product</h4>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="pull-right">
+                                <button class="btn btn-primary" id="form-submit">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{ form(init_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+    <script type="text/javascript">
+
+        $(function(){
+            $('button#form-submit').click(function(e){
+                $('div.product-init form').submit();
+            });
+        });
+
+    </script>
+{% endblock %}

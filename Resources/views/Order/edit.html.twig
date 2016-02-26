@@ -1,0 +1,104 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Edit Order{% endblock %}
+{% block subheader_text %}Ref: {{ order.get('reference_nbr') }}{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_order') }}"><i class="fa arrow"></i> Back to Orders</a>
+    </li>
+    {{ parent() }}
+{% endblock %}
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script src="{{ asset('bundles/mobilecartadmin/js/country-region-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        var cart = {{ cart.toJson()|raw }};
+
+        function renderTabs(aCart) {
+
+            // update items
+            App.Product.collections.selectedproducts = new App.Product.collections.SelectedProductCollection(aCart.items);
+            App.Product.views.selectedproducts = new App.Product.views.SelectedProductList({
+                collection: App.Product.collections.selectedproducts
+            });
+            App.Product.views.selectedproducts.render();
+
+            // update shipments
+            App.Shipping.collections.shipments = new App.Shipping.collections.SelectedMethodCollection(aCart.shipments);
+            App.Shipping.views.shipments = new App.Shipping.views.SelectedMethodList({
+                collection: App.Shipping.collections.shipments
+            });
+            App.Shipping.views.shipments.render();
+
+            // update discounts
+            App.Discount.collections.selecteddiscounts = new App.Discount.collections.SelectedDiscountCollection(aCart.discounts);
+            App.Discount.views.selecteddiscounts = new App.Discount.views.SelectedDiscountList({
+                collection: App.Discount.collections.selecteddiscounts
+            });
+            App.Discount.views.selecteddiscounts.render();
+
+            // update totals
+            App.Total.collections.totals = new App.Total.collections.TotalCollection(aCart.totals);
+            App.Total.views.totals = new App.Total.views.TotalList({
+                collection: App.Total.collections.totals
+            });
+            App.Total.views.totals.render();
+
+            // update customer
+            var customer = aCart.customer;
+            App.Customer.views.updateForm(customer);
+
+            cart = aCart;
+        }
+
+        $(function() {
+
+            // hide/show shipping address inputs
+            function toggleShippingSame(checkbox) {
+                $('form .shipping-input').each(function(){
+                    var el = $(this);
+                    if (checkbox.prop('checked')) {
+                        el.hide();
+                        el.siblings().hide();
+                    } else {
+                        el.show();
+                        el.siblings().show();
+                    }
+                });
+            }
+
+            var cartJson = $('#mobilecart_corebundle_order_json');
+
+            var checkbox = $('#mobilecart_corebundle_order_is_shipping_same');
+            checkbox.click(function(e){
+                toggleShippingSame($(this));
+            });
+            toggleShippingSame(checkbox);
+
+            // render tabs
+            renderTabs(cart);
+
+            // handle change of shipping address info
+            $('div.admin-form form .shipping-input').change(function(e){
+
+            });
+
+            // handle form submission
+            $('div.admin-form form').submit(function(e){
+                var cartStr = JSON.stringify(cart);
+                cartJson.val(cartStr);
+            });
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+
+{% block content -%}
+    <h1>Content</h1>
+
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ entity.createdat|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Old_id</th>
+                <td>{{ entity.oldid }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ entity.name }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ entity.slug }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ entity.content }}</td>
+            </tr>
+            <tr>
+                <th>Meta_description</th>
+                <td>{{ entity.metadescription }}</td>
+            </tr>
+            <tr>
+                <th>Meta_keywords</th>
+                <td>{{ entity.metakeywords }}</td>
+            </tr>
+            <tr>
+                <th>Meta_title</th>
+                <td>{{ entity.metatitle }}</td>
+            </tr>
+            <tr>
+                <th>Author</th>
+                <td>{{ entity.author }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('content') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('content_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
+{% endblock %}

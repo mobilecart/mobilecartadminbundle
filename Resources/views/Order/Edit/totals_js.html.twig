@@ -1,0 +1,69 @@
+<script type="text/template" id="total-grid-single">
+    <td><%- label %></td>
+    <td><%- value %></td>
+</script>
+
+<script type="text/javascript">
+
+    App.Total = {};
+    App.Total.models = {};
+    App.Total.collections = {};
+    App.Total.views = {};
+
+    App.Total.models.Total = Backbone.Model.extend({});
+    App.Total.collections.TotalCollection = Backbone.Collection.extend({
+        model: App.Total.models.Total
+    });
+
+    App.Total.views.TotalList = Backbone.View.extend({
+        el : 'table tbody.total-list',
+        tagName: 'tr',
+        initialize: function() {
+            var cells = this.collection;
+            cells.on('all', this.render, this);
+            //this.render(); // cannot render in initialize, since we're handling the key
+        },
+        render: function() {
+            var self = this;
+            this.$el.html('');
+            this.collection.each(function(total) {
+                self.addOne(total);
+            });
+            return this;
+        },
+        addOne: function(total) {
+            var view = new App.Total.views.TotalView({ model: total });
+            this.$el.append(view.render().el);
+            return this;
+        }
+    });
+
+    /**
+     * Single Total row
+     * @type {*|void}
+     */
+    App.Total.views.TotalView = Backbone.View.extend({
+        tagName: 'tr',
+        className: 'total-grid',
+        template: _.template($('#total-grid-single').html()),
+        initialize: function() {
+            this.model.bind('change', this.render, this);
+            this.model.bind('remove', this.remove, this);
+        },
+        render: function() {
+            var total = this.model.toJSON();
+            this.$el.html(this.template(total));
+            return this;
+        }
+    });
+
+</script>
+<script type="text/javascript">
+    $(function(){
+
+        // for populating backbonejs properties
+        var key = '{{ section_id }}';
+        App.Total.Container = $('#'+key);
+
+    });
+</script>

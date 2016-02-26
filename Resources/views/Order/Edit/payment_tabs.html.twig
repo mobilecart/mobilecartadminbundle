@@ -1,0 +1,54 @@
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a href="#section-payments" data-toggle="tab" aria-expanded="false">Payments</a>
+    </li>
+    <li class="">
+        <a href="#section-add-payment" data-toggle="tab" aria-expanded="true">Add Payments</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div id="section-payments" class="tab-pane tab-panel fade active in">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <tr>
+                    <th>Method</th>
+                    <th>Code</th>
+                    <th>Amount</th>
+                    <th>Is Refund</th>
+                </tr>
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.label }}</td>
+                    <td>{{ payment.code }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.isrefund }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div id="section-add-payment" class="tab-pane tab-panel fade">
+
+        <div class="payment-option">
+            <div class="payment-option-selector">
+                <label>No Payment</label>
+                <input type="radio" class="payment-option-input" name="payment_method" value="" />
+            </div>
+        </div>
+
+    {% for method in payment_methods %}
+        <div class="payment-option">
+            <div class="payment-option-selector">
+                <label>{{ method.label }}</label>
+                <input type="radio" class="payment-option-input" name="payment_method" value="{{ method.code }}" />
+            </div>
+            <div class="payment-option-form" style="display: none;">
+                {# dont break main form with more form tags, markup #}
+                {{ form_widget(method.getForm()) }}
+            </div>
+        </div>
+
+    {% endfor %}
+
+    </div>
+</div>

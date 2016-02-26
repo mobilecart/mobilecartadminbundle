@@ -1,0 +1,428 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+
+{% block admin_menu_list %}
+
+    {% if result.facetCounts|length > 0 %}
+    <li>
+
+        <a href="#"><i class="glyphicon glyphicon-th-list"></i> Choice Filters<span class="fa arrow fa-rotate-180"></span></a>
+        <ul class="nav nav-second-level collapse">
+
+    {% if result.facetFilters is defined %}
+        {% for facet in result.facetFilters %}
+            <li>
+                {% if facet.remove_url is defined and facet.remove_url|length > 0 %}
+                    <a href="{{ facet.remove_url }}">
+                        <i class="fa fa-times"></i>
+                        {{ facet.label }} : {{ facet.term }}
+                        {% if facet.count > 0 %} <span class="badge pull-right">{{ facet.count }}</span>{% endif %}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% endif %}
+
+    {% for facet, facets in result.facetCounts %}
+        {% if facets.terms %}
+            <li>
+                <a href="#">{{ facets.label }}<span class="fa arrow"></span></a>
+                <ul class="nav nav-third-level collapse">
+                    {% for termCounts in facets.terms %}
+                    <li class="{% if facets.isActive %}active {% endif %}">
+                    {% if termCounts.remove_url is defined and termCounts.remove_url|length > 0 %}
+                        <a href="{{ termCounts.remove_url }}" class="active">{{ termCounts.term }}
+                            {% if termCounts.count > 0 %} <span class="badge pull-right">{{ termCounts.count }}</span>{% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{{ termCounts.url }}">{{ termCounts.term }}
+                            {% if termCounts.count > 0 %} <span class="badge pull-right">{{ termCounts.count }}</span>{% endif %}
+                        </a>
+                    {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+    {% endfor %}
+        </ul>
+    </li>
+    {% endif %}
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block content %}
+
+    {% set counter = 0 %}
+    <form method="get" id="entity-form" action="{% block form_action %}{% endblock %}">
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 class="page-header">{% block header_text %}{% endblock %}</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 header-buttons">
+                {% block header_buttons %}
+
+                {% endblock %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                {% block filter_panel %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <a href="#filterPanel" class="pull-left btn btn-default collapsed" data-parent="#accordion" data-toggle="collapse">Basic Filters</a>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    {% if search.query|length > 0 %}
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default search-clear" type="button">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </button>
+                                    </span>
+                                    {% endif %}
+                                    <input type="text" class="form-control search-query" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default search-submit" type="button">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <input class="btn btn-primary pull-right" type="submit" name="sbmt" value="Search" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div id="filterPanel" class="panel-body panel-collapse collapse">
+                        <div id="filters-container">
+
+                    {% if search.advFilters is defined and search.advFilters|length > 0 %}
+                        {% for advfilter in search.advFilters %}
+                            {% set currentType = 'number' %}
+                            <div class="filter">
+                                <label>Filter</label>
+                                <select name="filter_field[{{ counter }}]" class="adv-filter-field">
+                                {% for obj in search.filterable %}
+                                    <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}{% if obj.code == advfilter.field %}{% set currentType = obj.type %} selected="selected"{% endif %}>{{ obj.label }}</option>
+                                {% endfor %}
+                                </select>
+                                <select name="filter_op[{{ counter }}]" class="adv-filter-op">
+                                {% for advfilterop in search.advfilterops %}
+                                    {% if currentType in advfilterop.types %}
+                                    <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'{% if advfilterop.code == advfilter.op %} selected="selected"{% endif %}>{{ advfilterop.label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                </select>
+                                <input type="text" class="adv-filter-input" name="filter_val[{{ counter }}]" value="{{ advfilter.value }}" />
+                                <a href="javascript:;" class="remove-filter glyphicon glyphicon-remove-circle" aria-hidden="true">&nbsp;</a>
+                            </div>
+                            {% set counter = counter + 1 %}
+                        {% endfor %}
+                    {% endif %}
+
+                            <div class="filter">
+                                <label>Filter</label>
+                                <select name="filter_field[{{ counter }}]" class="adv-filter-field">
+                                {% for obj in search.filterable %}
+                                    <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}>{{ obj.label }}</option>
+                                {% endfor %}
+                                </select>
+                                <select name="filter_op[{{ counter }}]" class="adv-filter-op">
+                                {% for advfilterop in search.advfilterops %}
+                                    {% if 'number' in advfilterop.types %}
+                                    <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'>{{ advfilterop.label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                </select>
+                                <input type="text" class="adv-filter-input" name="filter_val[{{ counter }}]" value="" />
+                                <a href="javascript:;" class="add-filter glyphicon glyphicon-plus-sign" aria-hidden="true">&nbsp;</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% for filterCode, filterValue in search.facetFilters %}
+                        <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
+                    {% endfor %}
+                </div>
+                {% endblock %}
+
+                {% block listing_panel %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <!-- Mass Actions -->
+                                <div class="input-group mass-actions">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default check-all">
+                                            <input type="checkbox" name="check_all" class="check-all" value="1" />
+                                        </button>
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                        {% for action in mass_actions if action.external == 0 %}
+                                            <li><a href="javascript:;" class="mass-action" data-toggle="modal" data-action="{{ action.input }}" data-target="#modal-shared">{{ action.label }}</a></li>
+                                        {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="btn-group pull-left" role="group">
+                                    <button type="button" data-target="#modal-shared" data-toggle="modal" class="btn btn-default mass-action-trash" data-action="mass_delete">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                                    </button>
+                                    <ul class="dropdown-menu export-menu" role="menu">
+                                    {% for key, label in search.formats if key != 'html' %}
+                                        <li><a href="javascript:;" class="export" data-format="{{ key }}">Export {{ label }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 pull-right">
+                                <div class="pull-right btn-group input-group" role="group">
+                                    {#{{ renderPager(getPages(result.pages, search.page), search.page) }}#}
+                                    <button type="button" class="btn pull-left btn-default prev {% if search.page == 1 %}disabled{% endif %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </button>
+                                    <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                                    <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Listing -->
+                    <div class="panel-body listing-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                    {% for col in columns %}
+                                        {% if col.sort %}
+                                        <th data-sort="{{ col.key }}"
+                                            {% if search.sortby == col.key and search.sortdir == 'desc' %} class="sorting_desc"
+                                            {% elseif search.sortby == col.key and search.sortdir == 'asc' %} class="sorting_asc"
+                                            {% else %} class="sorting"{% endif %}>{{ col.label }}</th>
+
+                                        {% else %}
+                                        <th>{{ col.label }}</th>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            {% if result.entities is defined %}
+                                {% for entity in result.entities %}
+                                    <tr>
+                                        <td class="col-checkbox">
+                                            <input type="checkbox" class="mass-action" name="item_ids[{{ entity.id }}]" value="{{ entity.id }}" />
+                                        </td>
+                                        {% for col in columns %}
+                                        <td>{{ renderGridField(search.getObjectType(), col.key, attribute(entity, col.key)) }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}
+
+            </div>
+        </div>
+
+    {% if search.getActiveFacetUrlData|length > 0 %}
+    <!-- Choice Filters , Facets -->
+        {% for filterop in search.getActiveFacetUrlData %}
+        <input type="hidden" name="{{ filterop.url_token }}" value="{{ filterop.term }}" />
+        {% endfor %}
+    {% endif %}
+
+        <input type="hidden" id="sort-by" name="{{ search.sortbyparam }}" value="{{ search.sortby }}" />
+        <input type="hidden" id="sort-dir" name="{{ search.sortdirparam }}" value="{{ search.sortdir }}" />
+        <input type="hidden" id="page-size" name="{{ search.limitParam }}" value="{{ search.limit }}" />
+        <input type="hidden" id="format" name="format" value="html" />
+
+    </form>
+
+    <!-- Modals -->
+    <div class="modal fade" id="modal-shared" tabindex="-1" role="dialog" aria-labelledby="modal-shared-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="modal-shared-label">Update</h4>
+                </div>
+                <div class="modal-body" id="modal-shared-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="modal-shared-submit" data-action="shared" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="field_code" id="modal-action-field" value="" />
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    {% set counter = search.advFilters|length + 1 %}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/GridFilterWidget.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ModalWidget.js') }}"></script>
+    <script type="text/javascript">
+        $(function(){
+
+            var counter = {{ counter }};
+            var filtersContainer = $('#filters-container');
+
+            // handle search filters UI
+            var gridWidget = new GridFilterWidget({
+                containerEl: filtersContainer,
+                counter: counter,
+                fields: {{ search.filterable|json_encode()|raw }},
+                ops: {{ search.advfilterops|json_encode()|raw }}
+            });
+
+            // handle modal UI
+            var modalWidget = new ModalWidget({
+                containerEl: $('#modal-shared'),
+                actions: {{ mass_actions|json_encode()|raw }}
+            });
+
+            var pagerForm = $('#entity-form');
+            var textInput = $('input.search-query');
+
+            // handle trash button action
+            // trigger (re)rendering of modal, just before it displays
+            $('button.mass-action-trash').click(function(e){
+                //e.preventDefault();
+                var self = $(this);
+                var action = self.attr('data-action');
+                $('button#modal-shared-submit').attr('data-action', action); // set action of submit button
+                modalWidget.setAction(action);
+                modalWidget.render();
+                //return false;
+            });
+
+            // handle dropdown for mass-actions, display modal
+            // trigger (re)rendering of modal, just before it displays
+            $('a.mass-action').click(function(e){
+                //e.preventDefault();
+                var self = $(this);
+                var action = self.attr('data-action');
+                $('button#modal-shared-submit').attr('data-action', action); // set action of submit button
+                modalWidget.setAction(action);
+                modalWidget.render();
+                //return false;
+            });
+
+            // handle sorting links in the listing table header
+            $('table.dataTable tr th').click(function(e){
+                e.preventDefault();
+
+                var self = $(this);
+
+                var isValid = self.hasClass('sorting')
+                        || self.hasClass('sorting_desc')
+                        || self.hasClass('sorting_asc');
+
+                if (!isValid) {
+                    return false;
+                }
+
+                var sortBy = self.attr('data-sort');
+                var sortDir = 'desc';
+                if (self.hasClass('sorting_desc')) {
+                    sortDir = 'asc';
+                }
+
+                $('#sort-by').val(sortBy);
+                $('#sort-dir').val(sortDir);
+                $('#page').val(1);
+                pagerForm.submit();
+                return false;
+            });
+
+            // export menu
+            $('ul.export-menu a.export').click(function(e){
+                var self = $(this);
+                var format = self.attr('data-format');
+                var formatInput = $('#format');
+                formatInput.val(format);
+                pagerForm.submit();
+                formatInput.val('html');
+                return false;
+            });
+
+            // paginator previous
+            $('button.prev').click(function(e){
+                e.preventDefault();
+                var el = $('input#page');
+                var page = parseInt(el.val()) - 1;
+                el.val(page);
+                pagerForm.submit();
+                return false;
+            });
+
+            // paginator next
+            $('button.next').click(function(e){
+                e.preventDefault();
+                var el = $('input#page');
+                var page = parseInt(el.val()) + 1;
+                el.val(page);
+                pagerForm.submit();
+                return false;
+            });
+
+            // handle check-all for mass actions
+            $('button.check-all').click(function(e){
+                e.preventDefault();
+                var self = $(this);
+                var checkbox = self.find('input.check-all');
+                var table = $('table.dataTable');
+                if (checkbox) {
+                    if (checkbox.prop('checked')) {
+                        checkbox.removeAttr('checked');
+                        table.find('input.mass-action').prop('checked', '');
+                    } else {
+                        checkbox.prop('checked', 'checked');
+                        table.find('input.mass-action').prop('checked', 'checked');
+                    }
+                }
+            });
+
+            $('button.search-clear').click(function(e){
+                textInput.val('');
+                pagerForm.submit();
+                return true;
+            });
+
+        });
+    </script>
+
+{% endblock %}

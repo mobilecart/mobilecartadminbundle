@@ -1,0 +1,9 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Edit Content{% endblock %}
+{% block subheader_text %}Name: {{ entity.name }}{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_content') }}"><i class="fa arrow"></i> Back to Contents</a>
+    </li>
+    {{ parent() }}
+{% endblock %}

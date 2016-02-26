@@ -1,0 +1,96 @@
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a href="#section-applied" data-toggle="tab" aria-expanded="false">Discounts</a>
+    </li>
+    <li class="">
+        <a href="#section-discounts" data-toggle="tab" aria-expanded="true">Add Discount</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div id="section-applied" class="tab-pane fade active in">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <thead class="">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Name</th>
+                        <th>Applies To</th>
+                    </tr>
+                </thead>
+                <tbody class="selected-discount-list">
+                {#% for discount in discounts %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" checked="checked" id="selected-{{ discount.id }}" class="selected-method" name="discounts[{{ discount.id }}]" />
+                        </td>
+                        <td>{{ discount.get('name') }}</td>
+                        <td>{{ discount.get('applied_to') }}</td>
+                    </tr>
+                {% endfor %#}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="section-discounts" class="tab-pane fade">
+
+        <div class="panel panel-default tab-panel adv-filters">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="pull-right adv-filters-buttons">
+                            <button class="btn btn-primary adv-filters-search">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body panel-collapse in" id="{{ section_id }}-filters-panel">
+                <div id="{{ section_id }}-filters-container" class="filters-container">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default tab-panel">
+            <div class="panel-heading">
+
+                <div class="row">
+                    <div class="col-md-5 grid-pager pull-left">
+
+                    </div>
+                    <div class="col-md-3">
+
+                        <div class="pull-left">
+                            <label>Show</label>
+                            <select name="per_page">
+                                <option value="15">15</option>
+                                <option selected="selected" value="30">30</option>
+                                <option value="45">45</option>
+                                <option value="60">60</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="panel-body listing-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover dataTable">
+                        <thead class="grid-header">
+
+                        </thead>
+                        <tbody class="discount-list">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

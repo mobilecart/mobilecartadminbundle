@@ -1,0 +1,49 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Create Customer{% endblock %}
+{% block subheader_text %}Customer Form{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_customer') }}"><i class="fa arrow"></i> Back to Customers</a>
+    </li>
+    {{ parent() }}
+{% endblock %}
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script type="text/javascript">
+        $(function() {
+
+            // hide/show shipping address inputs
+            function toggleShippingSame(checkbox) {
+                $('form .shipping-input').each(function(){
+                    var el = $(this);
+                    if (checkbox.prop('checked')) {
+                        el.hide();
+                        el.siblings().hide();
+                    } else {
+                        el.show();
+                        el.siblings().show();
+                    }
+                });
+            }
+
+            var checkbox = $('#mobilecart_corebundle_customertype_is_shipping_same');
+            checkbox.click(function(e){
+                toggleShippingSame($(this));
+            });
+            toggleShippingSame(checkbox);
+
+        });
+    </script>
+
+    <script src="{{ asset('bundles/mobilecartadmin/js/country-region-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+    </script>
+
+{% endblock %}

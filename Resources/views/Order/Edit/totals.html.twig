@@ -1,0 +1,19 @@
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover dataTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody class="total-list">
+        {% for code, total in cart.getTotals() %}
+            <tr>
+                <td>{{ total.getLabel() }}</td>
+                <td>{{ total.getValue() }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

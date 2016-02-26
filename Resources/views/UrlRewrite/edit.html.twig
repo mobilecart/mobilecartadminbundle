@@ -1,0 +1,9 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Edit URL Rewrite{% endblock %}
+{% block subheader_text %}URI: {{ entity.requesturi }}{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_url_rewrite') }}"><i class="fa arrow"></i> Back to URL Rewrites</a>
+    </li>
+    {{ parent() }}
+{% endblock %}

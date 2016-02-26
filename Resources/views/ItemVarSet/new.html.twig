@@ -1,0 +1,9 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Create ItemVarSet{% endblock %}
+{% block subheader_text %}ItemVarSet Form{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_item_var_set') }}"><i class="fa arrow"></i> Back to ItemVarSets</a>
+    </li>
+    {{ parent() }}
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+{% block content %}
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 class="page-header">{% block header_text %}Edit{% endblock %}</h1>
+            </div>
+        </div>
+
+        {% block above_form %}
+        {% endblock %}
+
+        <div class="row admin-form">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {% block container_start %}
+            <div class="col-sm-12">
+            {% endblock %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <h4>{% block subheader_text %}Edit{% endblock %}</h4>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="pull-right">
+                                    <button type="submit" class="btn btn-success" id="form-submit">Save</button>
+                                    <div class="text-center spinner" style="display:none;">
+                                        <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            {% if form_sections is defined %}
+                                {% for section, sectionData in form_sections %}
+                                    <li class="{% if section == 'general' %}active{% endif %}">
+                                        <a id="tab-{{ section }}" href="#section-{{ section }}" data-toggle="tab" aria-expanded="{% if section == 'general' %}true{% else %}false{% endif %}">{{ sectionData.label }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                            {% if template_sections is defined %}
+                                {% for section, sectionData in template_sections %}
+                                    <li {% if sectionData.active is defined %}class="active"{% endif %}>
+                                        <a id="tab-{{ section }}" href="#section-{{ section }}" data-toggle="tab" aria-expanded="{% if sectionData.active is defined %}true{% else %}false{% endif %}">{{ sectionData.label }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                        <div class="tab-content">
+                            {% if form_sections is defined %}
+                                {% for section, sectionData in form_sections %}
+                                <div id="section-{{ section }}" data-tab="tab-{{ section }}" class="tab-pane form-section fade{% if section == 'general' %} active in{% endif %}">
+                                    <div class="panel panel-default tab-panel">
+                                        <div class="panel-body">
+                                            {% for field in sectionData.fields %}
+                                                {{ form_row(form.offsetGet(field)) }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                            {% if template_sections is defined %}
+                                {% for section, sectionData in template_sections %}
+                                <div id="section-{{ section }}" data-tab="tab-{{ section }}" class="tab-pane form-section fade{% if sectionData.active is defined %} active in{% endif %}">
+                                    <div class="panel panel-default tab-panel">
+                                        <div class="panel-body">
+                                            {% include sectionData.template with sectionData %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            {% block container_end %}
+            </div>
+            {% endblock %}
+            {{ form_end(form) }}
+        </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="modal-shared" tabindex="-1" role="dialog" aria-labelledby="modal-shared-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="modal-shared-label">Message</h4>
+                </div>
+                <div class="modal-body" id="modal-shared-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="modal-shared-submit" data-action="shared" class="btn btn-primary hide">Save Changes</button>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="field_code" id="modal-action-field" value="" />
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/mobilecartadmin/js/spin.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ModalWidget.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/admin-form-widget.js') }}"></script>
+    <script type="text/javascript">
+
+        var formEl = $('div.admin-form form');
+
+        // handle modal UI
+        var modalWidget = new ModalWidget({
+            containerEl: $('#modal-shared'),
+            actions: []
+        });
+
+        // handle admin form, ajax request/response
+        var formWidget = new AdminFormWidget({
+            formEl: formEl,
+            elPrefix: formEl.attr('name'),
+            buttonEl: $('button#form-submit')
+        });
+
+    </script>
+
+    {% for section, sectionData in template_sections %}
+        {% if sectionData.js_template is defined %}
+            {% include sectionData.js_template with sectionData %}
+        {% endif %}
+    {% endfor %}
+{% endblock %}

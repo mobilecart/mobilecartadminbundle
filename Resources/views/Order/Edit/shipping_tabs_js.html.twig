@@ -1,0 +1,201 @@
+<script type="text/template" id="method-grid-single">
+    <td><input type="radio" class="select-method" id="select-<%- code %>" name="shipping_rate" /></td>
+    <td><%- company %></td>
+    <td><%- method %></td>
+    <td><%- price %></td>
+</script>
+
+<script type="text/template" id="selected-method-grid-single">
+    <td><input type="checkbox" name="shipping_methods[<%- code %>]" class="selected-method" id="selected-<%- code %>" checked="checked" /></td>
+    <td><%- company %></td>
+    <td><%- method %></td>
+    <td><input type="text" value="<%- price %>" name="shipping_prices[<%- code %>]" /></td>
+</script>
+
+<script type="text/javascript">
+
+App.Shipping = {};
+App.Shipping.models = {};
+App.Shipping.collections = {};
+App.Shipping.views = {};
+
+// Shipping Model and Collection
+App.Shipping.models.Method = Backbone.Model.extend({});
+App.Shipping.collections.Methods = Backbone.Collection.extend({
+    model: App.Shipping.models.Method,
+    url: App.serverURL + 'api/shipping/'
+});
+
+// Selected Shipping Model and Collection
+App.Shipping.models.SelectedMethod = Backbone.Model.extend({});
+App.Shipping.collections.SelectedMethodCollection = Backbone.Collection.extend({
+    model: App.Shipping.models.SelectedMethod
+});
+
+App.Shipping.views.MethodList = Backbone.View.extend({
+    selected: [],
+    initialize: function() {
+        this.collection.on('reset', this.render, this);
+        this.collection.on('sync', this.render, this);
+    },
+    render: function() {
+        var self = this;
+        this.$el.html('');
+        this.collection.each(function(method) {
+            self.addOne(method);
+        });
+        return this;
+    },
+    addOne: function(method) {
+        var self = this;
+
+        // todo : ensure selected methods are selected
+
+        var view = new App.Shipping.views.MethodListRow({
+            model: method,
+            selected: self.selected
+        });
+
+        this.$el.append(view.render().el);
+    }
+});
+
+/**
+ * Shipping Method Listing for selected Shipping Rates
+ *
+ * pass in the collection
+ *  render rows
+ *
+ */
+App.Shipping.views.SelectedMethodList = Backbone.View.extend({
+    el : '.selected-method-list',
+    selected: [],
+    initialize: function() {
+        var shipments = this.collection;
+        shipments.on('all', this.render, this);
+    },
+    render: function() {
+        var self = this;
+        this.$el.html('');
+        this.collection.each(function(item) {
+            self.addOne(item);
+        });
+        return this;
+    },
+    addOne: function(method) {
+        var view = new App.Shipping.views.SelectedMethodListRow({ model: method });
+        this.$el.append(view.render().el);
+        return this;
+    }
+});
+
+App.Shipping.views.SelectedMethodListRow = Backbone.View.extend({
+    tagName: 'tr',
+    className: 'selected-item-grid',
+    selected: [],
+    template: _.template($('#selected-method-grid-single').html()),
+    initialize: function() {
+
+    },
+    render: function() {
+        var self = this;
+        var method = this.model;
+        var methodId = method.get('code');
+        method = method.toJSON();
+        if (self.selected.indexOf(methodId) > -1) {
+            method.checked = 1;
+        } else {
+            method.checked = 0;
+        }
+        this.$el.html(this.template(method));
+        return this;
+    }
+});
+
+App.Shipping.views.MethodListRow = Backbone.View.extend({
+    tagName: 'tr',
+    className: 'item-grid',
+    selected: [],
+    events: {
+        'click input.select-method': 'methodClick'
+    },
+    template: _.template($('#method-grid-single').html()),
+    initialize: function() {
+
+    },
+    render: function() {
+        var self = this;
+        var method = this.model;
+        var methodId = method.get('code');
+        method = method.toJSON();
+
+        if (self.selected.indexOf(methodId) > -1) {
+            method.checked = 1;
+        } else {
+            method.checked = 0;
+        }
+
+        this.$el.html(this.template(method));
+        return this;
+    },
+    methodClick: function(e) {
+        var self = this;
+        var method = this.model;
+        var link = $(e.currentTarget);
+
+        var view = new App.Shipping.views.SelectedMethodListRow({
+            model: method
+        });
+
+        var idStr = link.attr('id');
+        var id = idStr.replace('select-', '');
+        var checkbox = $('input#selected-' + id);
+
+        if (checkbox.length > 0) {
+            checkbox.parent().remove();
+        } else {
+            App.Shipping.Container.find('.selected-method-list').append(view.render().el);
+        }
+
+        var methodStr = JSON.stringify(method.toJSON());
+        var cartStr = JSON.stringify(cart);
+
+        // send update via ajax
+        var url = App.serverURL + 'admin/order/update/shipping';
+        $.ajax({
+            url: url,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                cart: cartStr,
+                shipping_method: methodStr
+            }
+        }).done(function(data) {
+
+            // update cart
+            renderTabs(data.cart);
+        });
+    }
+});
+    
+</script>
+<script type="text/javascript">
+    $(function(){
+
+        // for populating backbonejs properties
+        var key = '{{ section_id }}';
+        App.Shipping.Container = $('#' + key);
+
+        // shipping method collection
+        App.Shipping.collections.shipping_methods = new App.Shipping.collections.Methods();
+
+        // method listing view, for all methods
+        App.Shipping.views.method_list = new App.Shipping.views.MethodList({
+            collection: App.Shipping.collections.shipping_methods,
+            el: App.Shipping.Container.find('.method-list')
+        });
+        App.Shipping.views.method_list.selected = {{ method_codes|json_encode()|raw }};
+
+        App.Shipping.collections.shipping_methods.fetch();
+    });
+</script>

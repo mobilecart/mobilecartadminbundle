@@ -1,0 +1,18 @@
+<link href="/bundles/mobilecartadmin/css/html5imageuploader/uploader-style.css" rel="stylesheet" type="text/css" />
+<script src="/bundles/mobilecartadmin/js/html5imageuploader/jquery.html5uploader-1.1.js"></script>
+<script src="/bundles/mobilecartadmin/js/html5imageuploader/exif.js"></script>
+<script src="/bundles/mobilecartadmin/js/html5imageuploader/ImageTable.js"></script>
+<script type="text/javascript">
+
+    // ImageTable instance
+    var imageTable = new ImageTable({
+        bodyEl: $('div#section-image-list table tbody')
+    });
+
+    // main.js preparation
+    var uploadQuery = '{{ upload_query|raw }}';
+    var uploadUrl = '/admin/image/upload' + uploadQuery;
+    var baseUploadUrl = uploadUrl;
+    var retrieveUrl = '/admin/image/';
+</script>
+<script src="/bundles/mobilecartadmin/js/html5imageuploader/main.js"></script>

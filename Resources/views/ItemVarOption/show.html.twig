@@ -1,0 +1,40 @@
+{% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
+
+{% block content %}
+    <h1>ItemVarOption</h1>
+
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Value</th>
+                <td>{{ entity.value }}</td>
+            </tr>
+            <tr>
+                <th>Is_in_stock</th>
+                <td>{{ entity.isinstock }}</td>
+            </tr>
+            <tr>
+                <th>Additional_price</th>
+                <td>{{ entity.additionalprice }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('cart_admin_itemvaroption') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('cart_admin_itemvaroption_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/index.html.twig' %}
+{% block header_text %}Shipping Methods{% endblock %}
+{% block form_action %}{{ path('cart_admin_shipping_method') }}{% endblock %}
+{% block header_buttons %}
+    <a class="btn btn-success" href="{{ path('cart_admin_shipping_method_new') }}">Create</a>
+{% endblock %}
+{% block filter_panel %} {% endblock %}

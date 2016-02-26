@@ -1,0 +1,6 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/index.html.twig' %}
+{% block header_text %}Products{% endblock %}
+{% block form_action %}{{ path('cart_admin_product') }}{% endblock %}
+{% block header_buttons %}
+    <a class="btn btn-success" href="{{ path('cart_admin_product_new') }}">Create</a>
+{% endblock %}

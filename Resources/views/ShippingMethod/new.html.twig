@@ -1,0 +1,44 @@
+{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% block header_text %}Create Shipping Method{% endblock %}
+{% block subheader_text %}Shipping Method Form{% endblock %}
+{% block admin_menu_list %}
+    <li>
+        <a href="{{ renderGridBackUrl('cart_admin_shipping_method') }}"><i class="fa arrow"></i> Back to Shipping Methods</a>
+    </li>
+    {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/mobilecartadmin/css/discount.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/shippingWidget.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            widget = shippingWidget.initialize({
+                containerEl: $('{{ container }}'),
+                conditionInput: $('{{ condition_input }}'),
+                operators: {{ operators_json|raw }},
+                logicalOperators: {{ logical_operators_json|raw }},
+                varSets: {{ var_sets|raw }}
+            });
+
+            // @TODO : move this to attachEvents
+            $('#builder-submit').click(function(e) {
+                widget.serialize();
+                return true;
+            });
+
+            /*
+            $('a.builder-serialize').click(function(e) {
+                e.preventDefault();
+                $('#debug-condition').html('<pre>'+widget.getConditionText()+'</pre>');
+            }); //*/
+
+        });
+    </script>
+{% endblock %}
