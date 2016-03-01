@@ -1,4 +1,4 @@
-{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit Shipping Method{% endblock %}
 {% block subheader_text %}{{ entity.company }} {{ entity.method }}{% endblock %}
 {% block admin_menu_list %}

@@ -1,4 +1,4 @@
-{% extends 'MobileCartAdminBundle::Widgets/Template/index.html.twig' %}
+{% extends templatePath('Widgets/Template:index.html.twig', 'admin') %}
 {% block header_text %}Categories{% endblock %}
 {% block form_action %}{{ path('cart_admin_category') }}{% endblock %}
 {% block header_buttons %}

@@ -1,4 +1,4 @@
-{% extends 'MobileCartAdminBundle::Widgets/Template/edit.html.twig' %}
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit URL Rewrite{% endblock %}
 {% block subheader_text %}URI: {{ entity.requesturi }}{% endblock %}
 {% block admin_menu_list %}
