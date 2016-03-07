@@ -1,9 +1,10 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit {{ type }} Product{% endblock %}
 {% block subheader_text %}SKU: {{ entity.sku }}{% endblock %}
-{% block admin_menu_list %}
-    <li>
-        <a href="{{ renderGridBackUrl('cart_admin_product') }}"><i class="fa arrow"></i> Back to Products</a>
-    </li>
-    {{ parent() }}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_product') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
 {% endblock %}

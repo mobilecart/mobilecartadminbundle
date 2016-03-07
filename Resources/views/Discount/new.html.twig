@@ -1,11 +1,12 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Create Discount{% endblock %}
 {% block subheader_text %}Discount Form{% endblock %}
-{% block admin_menu_list %}
-    <li>
-        <a href="{{ renderGridBackUrl('cart_admin_discount') }}"><i class="fa arrow"></i> Back to Discounts</a>
-    </li>
-    {{ parent() }}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_discount') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}

@@ -1,9 +1,10 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit ItemVarOption{% endblock %}
 {% block subheader_text %}Value: {{ entity.value }}{% endblock %}
-{% block admin_menu_list %}
-    <li>
-        <a href="{{ renderGridBackUrl('cart_admin_item_var_option') }}"><i class="fa arrow"></i> Back to ItemVarOptions</a>
-    </li>
-    {{ parent() }}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_item_var_option') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
 {% endblock %}

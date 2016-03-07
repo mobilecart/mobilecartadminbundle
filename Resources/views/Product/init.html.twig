@@ -1,10 +1,12 @@
 {% extends 'MobileCartAdminBundle::admin-layout.html.twig' %}
 {% form_theme init_form 'bootstrap_3_layout.html.twig' %}
 
-{% block admin_menu_list %}
-    <li>
-        <a href="{{ renderGridBackUrl('cart_admin_product') }}"><i class="fa arrow"></i> Back to Products</a>
-    </li>
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_product') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}

@@ -1,9 +1,10 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Create Category{% endblock %}
 {% block subheader_text %}Category Form{% endblock %}
-{% block admin_menu_list %}
-    <li>
-        <a href="{{ renderGridBackUrl('cart_admin_category') }}"><i class="fa arrow"></i> Back to Categories</a>
-    </li>
-    {{ parent() }}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_category') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
 {% endblock %}
