@@ -515,7 +515,7 @@ input.number {
     width: 60px;
 }
 
-input#page {
+div.paginator input.paginator {
     width: 60px;
 }
 

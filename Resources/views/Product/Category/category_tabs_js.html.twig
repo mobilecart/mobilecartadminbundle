@@ -11,16 +11,17 @@
 </script>
 
 <script type="text/html" id="category-pagination-template">
-    <% if (currentPage != 1) { %>
-    <button class="prev btn-default btn">Prev</button>
-    <% } %>
 
-    <label for="page">Page</label>
-    <input type="number" value="<%= currentPage %>" name="page" id="category-page" class="number"> of <%= totalPages %>
+    <div class="pull-right btn-group input-group paginator" role="group">
+        <button type="button" class="btn pull-left btn-default prev <% if (currentPage == 1) { %>disabled<% } %>" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </button>
+        <input type="number" id="category-page" class="form-control number paginator" name="page" value="<%= currentPage %>" />
+        <button type="button" class="btn pull-right btn-default next <% if (currentPage >= lastPage) { %>disabled<% } %>" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+        </button>
+    </div>
 
-    <% if (lastPage != currentPage && lastPage != 0) { %>
-    <button class="btn btn-default next">Next</button>
-    <% } %>
 </script>
 
 <script type="text/html" id="category-grid-adv-filter">
@@ -79,13 +80,13 @@ App.Category.collections.AdvFilterCollection = Backbone.Collection.extend({
     model: App.Category.models.AdvFilter
 });
 
-// Selected Categorys
+// Selected Categories
 App.Category.models.SelectedCategory = Backbone.Model.extend({});
 App.Category.collections.SelectedCategoryCollection = Backbone.Collection.extend({
     model: App.Category.models.SelectedCategory
 });
 
-// Categorys
+// Categories
 App.Category.models.Category = Backbone.Model.extend({});
 App.Category.collections.PaginatedCollection = Backbone.PageableCollection.extend({
     key: '',
@@ -145,7 +146,7 @@ App.Category.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
             App.Category.views.advfilters = new App.Category.views.GridFilterView({
                 collection: App.Category.collections.advfilters,
-                el: App.Category.Container.find('div#categorys-filters-container')
+                el: App.Category.Container.find('div#categories-filters-container')
             });
 
             App.Category.views.advfilters.ops = search.advFilterOps; // [{code:'gt',label:'Greater Than',types:["number","date"]},..]
@@ -168,9 +169,10 @@ App.Category.collections.PaginatedCollection = Backbone.PageableCollection.exten
 App.Category.views.CategoryList = Backbone.View.extend({
     el : '.category-list',
     selected: [],
+    selected_view: {},
     initialize: function() {
-        var categorys = this.collection;
-        categorys.on('add', this.addOne, this);
+        var categories = this.collection;
+        categories.on('add', this.addOne, this);
         this.render();
     },
     render: function() {
@@ -180,8 +182,12 @@ App.Category.views.CategoryList = Backbone.View.extend({
     addOne: function(category) {
         var view = new App.Category.views.CategoryView({ model: category });
         view.selected = this.selected;
+        view.parent_view = this;
         this.$el.append(view.render().el);
         return this;
+    },
+    removeSelectedCategoryViewById: function(id) {
+        this.selected_view.removeCategoryViewById(id);
     }
 });
 
@@ -189,6 +195,7 @@ App.Category.views.CategoryView = Backbone.View.extend({
     tagName: 'tr',
     className: 'item-grid',
     selected: [],
+    parent_view: {},
     events: {
         'click input.select-category': 'categoryClick'
     },
@@ -199,7 +206,6 @@ App.Category.views.CategoryView = Backbone.View.extend({
     },
     render: function() {
         var self = this;
-
         var category = this.model.toJSON();
         var categoryId = category.id;
 
@@ -213,30 +219,31 @@ App.Category.views.CategoryView = Backbone.View.extend({
         return this;
     },
     categoryClick: function(e) {
-        var category = this.model;
         var self = this;
+        var category = this.model;
 
         var link = $(e.currentTarget);
         var idStr = link.attr('id');
         var idParts = idStr.split('-');
         var id = idParts[1];
-        var checkbox = $('input#selected-category-id-' + id);
 
-        // TODO :
+        // find checkbox in selected area
+        var checkbox = $('input#selected-category-id-' + id);
 
         if (checkbox.length > 0) {
 
-
-
+            // remove row
+            self.parent_view.removeSelectedCategoryViewById(id);
         } else {
 
-
+            // add row
+            this.parent_view.selected_view.addOne(category);
         }
     }
 });
 
 /**
- * Category Listing for selected Categorys
+ * Category Listing for selected Categories
  *
  * pass in the collection
  *  render rows
@@ -245,22 +252,33 @@ App.Category.views.CategoryView = Backbone.View.extend({
 App.Category.views.SelectedCategoryList = Backbone.View.extend({
     el : '.selected-category-list',
     selected: [],
+    child_views: [],
     initialize: function() {
-        var shipments = this.collection;
-        shipments.on('all', this.render, this);
+        var categories = this.collection;
+        categories.on('add', this.addOne, this);
     },
     render: function() {
         var self = this;
-        this.$el.html('');
-        this.collection.each(function(category) {
-            self.addOne(category);
-        });
+
         return this;
     },
     addOne: function(category) {
         var view = new App.Category.views.SelectedCategoryView({ model: category });
+        view.parent = this;
+        this.child_views.push(view);
         this.$el.append(view.render().el);
         return this;
+    },
+    removeCategoryViewById: function(id) {
+        var self = this;
+        var idx = 0;
+        _.each(this.child_views, function(view) {
+            if (view.model.get('id') == id) {
+                view.remove();
+                self.child_views.splice(idx, 1);
+            }
+            idx++;
+        });
     }
 });
 
@@ -268,6 +286,7 @@ App.Category.views.SelectedCategoryView = Backbone.View.extend({
     tagName: 'tr',
     className: 'selected-item-grid',
     selected: [],
+    parent: {},
     events: {
         'click input.selected-category': 'categoryClick'
     },
@@ -287,10 +306,20 @@ App.Category.views.SelectedCategoryView = Backbone.View.extend({
         return this;
     },
     categoryClick: function(e) {
+        var self = this;
         var category = this.model;
-        var cartStr = JSON.stringify(cart);
 
-        // TODO :
+        var link = $(e.currentTarget);
+        var idStr = link.attr('id');
+        var idParts = idStr.split('-');
+        var id = idParts[3];
+
+        var checkbox = $('input#category-' + id);
+        if (checkbox.length > 0) {
+            checkbox.attr('checked', false);
+        }
+
+        self.parent.removeCategoryViewById(id);
     }
 });
 
@@ -308,8 +337,8 @@ App.Category.views.GridFilterView = Backbone.View.extend({
     },
     template: _.template($('#category-grid-adv-filter').html()),
     initialize: function() {
-        var categorys = this.collection;
-        categorys.on('reset', this.render, this);
+        var categories = this.collection;
+        categories.on('reset', this.render, this);
     },
     render: function() {
         var self = this;
@@ -531,28 +560,28 @@ App.Category.views.TableButtons = Backbone.View.extend({
         e.preventDefault();
 
         // filter fields
-        App.Category.collections.categorys.queryParams.filter_field = [];
+        App.Category.collections.categories.queryParams.filter_field = [];
         App.Category.Container.find('select.adv-filter-field').each(function(){
             var self = $(this);
-            App.Category.collections.categorys.queryParams.filter_field.push(self.val());
+            App.Category.collections.categories.queryParams.filter_field.push(self.val());
         });
 
         // filter operations
-        App.Category.collections.categorys.queryParams.filter_op = [];
+        App.Category.collections.categories.queryParams.filter_op = [];
         App.Category.Container.find('select.adv-filter-op').each(function(){
             var self = $(this);
-            App.Category.collections.categorys.queryParams.filter_op.push(self.val());
+            App.Category.collections.categories.queryParams.filter_op.push(self.val());
         });
 
         // filter values
-        App.Category.collections.categorys.queryParams.filter_val = [];
+        App.Category.collections.categories.queryParams.filter_val = [];
         App.Category.Container.find('.adv-filter-input').each(function(){
             var self = $(this);
-            App.Category.collections.categorys.queryParams.filter_val.push(self.val());
+            App.Category.collections.categories.queryParams.filter_val.push(self.val());
         });
 
-        App.Category.collections.categorys.currentPage = 1;
-        App.Category.collections.categorys.fetch();
+        App.Category.collections.categories.currentPage = 1;
+        App.Category.collections.categories.fetch();
 
         return false;
     }
@@ -576,7 +605,7 @@ App.Category.views.TableHeading = Backbone.View.extend({
         this.$el.html('');
 
         var html = '';
-        html += '<th><input type="checkbox" value="1" name="category_check_all"></th>';
+        html += '<th>&nbsp;</th>';
 
         this.collection.each(function(cell) {
             if (self.columns.indexOf(cell.get('code')) >= 0) {
@@ -610,10 +639,10 @@ App.Category.views.TableHeading = Backbone.View.extend({
             link.addClass('sorting_desc');
         }
 
-        App.Category.collections.categorys.state.sortKey = sort;
-        App.Category.collections.categorys.state.order = sortDir;
-        App.Category.collections.categorys.state.currentPage = 1;
-        App.Category.collections.categorys.fetch();
+        App.Category.collections.categories.state.sortKey = sort;
+        App.Category.collections.categories.state.order = sortDir;
+        App.Category.collections.categories.state.currentPage = 1;
+        App.Category.collections.categories.fetch();
 
         return true;
     }
@@ -662,24 +691,44 @@ App.Category.views.PaginatedView = Backbone.View.extend({
     $(function(){
 
         // for populating backbonejs properties
-        var key = '{{ section_id }}';
+        var key = 'section-{{ section_id }}';
+        var selectedCategories = {{ categories|json_encode()|raw }};
         App.Category.Container = $('#' + key);
 
         // category model collection
-        App.Category.collections.categorys = new App.Category.collections.PaginatedCollection({
+        App.Category.collections.categories = new App.Category.collections.PaginatedCollection({
             url: App.serverURL + 'admin/category/'
         });
 
+        // selected category model collection
+        App.Category.collections.selected_categories = new App.Category.collections.SelectedCategoryCollection();
+
+        // selected category listing
+        App.Category.views.selected_categories = new App.Category.views.SelectedCategoryList({
+            collection: App.Category.collections.selected_categories,
+            el: App.Category.Container.find('.selected-category-list')
+        });
+
+        if (selectedCategories.length > 0) {
+            for (var x = 0; x < selectedCategories.length; x++) {
+                var aCategory = selectedCategories[x];
+                var aModel = new App.Category.models.SelectedCategory(aCategory);
+                App.Category.collections.selected_categories.add(aModel);
+            }
+        }
+
         // category listing view, for all categories
-        App.Category.views.categorys = new App.Category.views.CategoryList({
-            collection: App.Category.collections.categorys,
+        App.Category.views.categories = new App.Category.views.CategoryList({
+            collection: App.Category.collections.categories,
             el: App.Category.Container.find('.category-list')
         });
-        App.Category.views.categorys.selected = {{ category_ids|json_encode()|raw }};
+
+        App.Category.views.categories.selected = {{ category_ids|json_encode()|raw }};
+        App.Category.views.categories.selected_view = App.Category.views.selected_categories;
 
         // pager controls
         App.Category.views.pager = new App.Category.views.PaginatedView({
-            collection: App.Category.collections.categorys,
+            collection: App.Category.collections.categories,
             el: App.Category.Container.find('div.grid-pager')
         });
 
@@ -689,7 +738,7 @@ App.Category.views.PaginatedView = Backbone.View.extend({
         });
 
         // fetch category collection and trigger views
-        App.Category.collections.categorys.fetch();
+        App.Category.collections.categories.fetch();
 
     });
 </script>

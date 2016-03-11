@@ -197,12 +197,12 @@
                                 #}
                             </div>
                             <div class="col-xs-6 pull-right">
-                                <div class="pull-right btn-group input-group" role="group">
+                                <div class="pull-right btn-group input-group paginator" role="group">
                                     {#{{ renderPager(getPages(result.pages, search.page), search.page) }}#}
                                     <button type="button" class="btn pull-left btn-default prev {% if search.page == 1 %}disabled{% endif %}" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </button>
-                                    <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                                    <input type="number" id="page" class="form-control number paginator" name="{{ search.pageParam }}" value="{{ search.page }}" />
                                     <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </button>
