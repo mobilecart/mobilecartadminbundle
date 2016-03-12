@@ -5,7 +5,7 @@
             "MobileCart\\AdminBundle\\" : ""
         }
     },
-    "type": "project",
+    "type": "symfony-bundle",
     "description": "Admin Theme for Mobile Cart : an E-Commerce Shopping Cart built on Symfony",
     "keywords": ["shopping", "cart", "e-commerce"],
     "homepage": "http://mobilecart.io",
