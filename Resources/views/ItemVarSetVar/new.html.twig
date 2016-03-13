@@ -1,0 +1,10 @@
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
+{% block header_text %}Create Variant Mapping{% endblock %}
+{% block subheader_text %}Variant Map Form{% endblock %}
+{% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ renderGridBackUrl('cart_admin_item_var_set_var') }}" class="btn btn-default">Back</a>
+        </div>
+    </div>
+{% endblock %}
