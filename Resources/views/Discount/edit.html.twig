@@ -21,21 +21,17 @@
 
             var widget = new ConditionWidget({
                 containerEl: $('{{ container }}'),
-                targetInput: $('{{ condition_input }}'),
-                conditionInput: $('{{ target_input }}'),
+                targetInput: $('{{ target_input }}'),
+                conditionInput: $('{{ condition_input }}'),
                 operators: {{ operators_json|raw }},
                 logicalOperators: {{ logical_operators_json|raw }},
+                containerOperators: {{ container_operators_json|raw }},
                 varSets: {{ var_sets|raw }}
             });
 
-            $('#builder-submit').click(function(e) {
+            $('#form-submit').click(function(e) {
                 widget.serialize();
                 return true;
-            });
-
-            $('a.builder-serialize').click(function(e) {
-                e.preventDefault();
-                widget.serialize();
             });
 
         });

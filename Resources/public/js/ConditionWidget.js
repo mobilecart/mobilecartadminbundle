@@ -4,6 +4,7 @@ var ConditionWidget = function(info) {
     this.containerEl = info.containerEl;
     this.operators = info.operators;
     this.logicalOperators = info.logicalOperators;
+    this.containerOperators = info.containerOperators;
     this.varSets = info.varSets;
     this.conditionInput = info.conditionInput;
     this.targetInput = info.targetInput;
@@ -39,6 +40,7 @@ ConditionWidget.prototype = {
 
     containerEl: {},
     operators: {},
+    containerOperators: {},
     logicalOperators: {},
     varSets: {},
     currentVarSet: {},
@@ -56,38 +58,60 @@ ConditionWidget.prototype = {
         var cEl = this.containerEl;
 
         cEl.delegate('a.add-condition', 'click', function(e) {
+
             e.preventDefault();
             var self = $(this);
             var parent = self.parent();
+            var parent3 = parent.parent().parent();
+
+            var depth = self.attr('data-depth');
+            if (typeof depth == 'undefined') {
+                depth = 1;
+            }
+
+            var liEl = false;
+            if (parent3.hasClass('root')) {
+                depth = 1;
+            } else {
+                var selectEl = parent3.find('div.condition-comparison select.compare-operator');
+                liEl = selectEl.parent();
+            }
 
             if (!parent.hasClass('condition')) {
                 parent.addClass('condition');
             }
             var condition = me.createConditionObject();
 
-            //@todo: can we simplify buildCondition?
-            //condition.entity_type = me.currentVarSet;
-            parent.html(me.buildCondition(null, condition));
-            parent.parent().append('<li>'+me.buildAddLinks()+'</li>');
+            parent.html(me.buildCondition(condition, liEl));
+            parent.parent().append('<li>' + me.buildAddLinks(depth) + '</li>');
         });
 
         cEl.delegate('a.add-compare', 'click', function(e) {
             e.preventDefault();
             var self = $(this);
+
+            var depth = self.attr('data-depth');
+            if (typeof depth == 'undefined') {
+                depth = 1;
+            }
+
             var parent = self.parent();
+
             var info = {
                 logicalOperators: me.logicalOperators
             };
+
             if (!parent.hasClass('condition-compare')) {
                 parent.addClass('condition-compare');
             }
             //var addRemoveLink = !parent.hasClass('root');
 
-            var compareHtml = me.buildCompareControl(true);
-            compareHtml += me.buildConditionsContainer(true);
+            var compareHtml = me.buildCompareControl(parent);
+            var newDepth = depth + 1;
+            compareHtml += me.buildConditionsContainer(true, newDepth);
 
             parent.html(compareHtml);
-            parent.parent().append('<li>'+me.buildAddLinks()+'</li>');
+            parent.parent().append('<li>' + me.buildAddLinks(depth) + '</li>');
         });
 
         cEl.delegate('a.condition-remove', 'click', function(e) {
@@ -105,6 +129,7 @@ ConditionWidget.prototype = {
             }
         });
 
+        // change fields options when changing entity type
         cEl.delegate('select.entity-type', 'change', function(e) {
             var self = $(this);
             var el = self.parent().find('select.entity-field');
@@ -117,23 +142,30 @@ ConditionWidget.prototype = {
         var vars = this.varSets[entity_type]['vars'];
         for(option in vars) {
             var info = vars[option];
-            options += '<option value="' + option + '">' + info['name'] + '</option>';
+            options += '<option data-entity-type="' + entity_type + '" value="' + option + '">' + info['name'] + '</option>';
         }
         return options;
     },
 
-    buildSelectEntityTypes: function(types, value) {
+    buildSelectEntityTypes: function(types, value, hideOthers) {
         var select = '<select class="entity-type">';
         for(type in types) {
+
+            if (
+                typeof hideOthers != 'undefined'
+                && hideOthers == true
+                && type != value
+                )
+            {
+                continue;
+            }
+
             var name = types[type]['name'];
             select += '<option value="' + type + '"';
             if (type == value) {
                 select += ' selected="selected"';
             }
             select += '>' + name + '</option>';
-            if (this.currentVarSet == '') {
-                this.currentVarSet = types[type]['name'];
-            }
         }
         select += '</select>';
         return select;
@@ -153,7 +185,7 @@ ConditionWidget.prototype = {
     },
 
     buildSelectGeneric: function (values, className, selected) {
-        var select = '<select class="'+className+'">';
+        var select = '<select class="' + className + '">';
         for(value in values) {
             var label = values[value];
             select += '<option value="' + value + '"';
@@ -170,44 +202,82 @@ ConditionWidget.prototype = {
         return '<input class="' + className + '" type="text" value="' + value + '" />';
     },
 
-    buildAddLinks: function() {
-        var html = '<a class="add-condition" href="#">[+condition]</a>';
-        html += '<a class="add-compare" href="#">[+combination]</a>';
+    buildAddLinks: function(depth) {
+
+        if (typeof depth == 'undefined') {
+            depth = 1;
+        }
+
+        var html = '';
+        if (depth == 1) {
+            html += '<a class="add-compare btn btn-default" data-depth="' + depth + '" href="#">Add Criteria</a>';
+        } else {
+            html = '<a class="add-condition btn btn-default" data-depth="' + depth + '" href="#">Add Criteria</a>';
+        }
+
         return html;
     },
 
-    buildCondition: function(varSet, condition) {
-        var html = '<p><a class="condition-remove" href="#">-</a>&nbsp;';
-        html += this.buildSelectEntityTypes(this.varSets, varSet) + ' : ';
+    buildCondition: function(condition, liEl) {
 
-        if (varSet == null || typeof varSet == 'undefined') {
-            for (varSet in this.varSets) {
-                break;
+        var hideEntityTypeInput = false;
+        if (typeof liEl != 'undefined') {
+            var compareEl = liEl.find('select.compare-operator');
+            if (typeof compareEl.val() != 'undefined') {
+                var selectVal = compareEl.val();
+                if (selectVal.length > 1 && selectVal != 'and' && selectVal != 'or') {
+                    hideEntityTypeInput = true;
+                    condition.entity_type = selectVal;
+                }
             }
         }
 
-        html += this.buildSelectEntityFields(this.varSets[varSet]['vars'], condition.entity_field) + ' : ';
+        var html = '<p>';
+        html += '<a class="condition-remove" href="#">-</a>&nbsp;';
+        html += this.buildSelectEntityTypes(this.varSets, condition.entity_type, hideEntityTypeInput) + ' : ';
+        html += this.buildSelectEntityFields(this.varSets[condition.entity_type]['vars'], condition.entity_field) + ' : ';
         html += this.buildSelectGeneric(this.operators, 'condition-operator', condition.operator);
-        html += ' : ' + this.buildText('condition-value', condition.value) + '</p>';
+        html += ' : ' + this.buildText('condition-value', condition.compare_value);
+        html += '</p>';
         return html;
     },
 
-    buildCompareControl: function(addRemoveLink) {
+    buildCompareControl: function(el) {
+        // el should be a li element
+        var self = this;
         var html = '<div class="condition-comparison">';
+        var addRemoveLink = !el.hasClass('root'); // parent of link element
+        var parent3 = $(el).parent().parent(); // great-grandparent of link element
+        var enableContainerOps = parent3.hasClass('root');// || el.hasClass('root');
+
         html += '<p>';
         if (addRemoveLink === true) {
             html += '<a class="compare-remove" href="#">-</a>&nbsp;';
         }
-        html += this.buildSelectGeneric(this.logicalOperators, 'compare-operator') + '</p>';
+
+        if (enableContainerOps && typeof self.containerOperators != 'undefined') {
+            html += this.buildSelectGeneric(self.containerOperators, 'compare-operator');
+        } else {
+            html += this.buildSelectGeneric(self.logicalOperators, 'compare-operator');
+        }
+
+        html += '</p>';
         html += '</div>';
+
         return html;
     },
 
-    buildConditionsContainer: function(addLinks) {
+    buildConditionsContainer: function(addLinks, depth) {
         var html = '<ul class="compare-conditions">';
-        if (addLinks) {
-            html += '<li>' + this.buildAddLinks() + '</li>';
+
+        if (typeof depth == 'undefined') {
+            depth = 1;
         }
+
+        if (addLinks) {
+            html += '<li>' + this.buildAddLinks(depth) + '</li>';
+        }
+
         html += '</ul>';
         return html;
     },
@@ -235,7 +305,7 @@ ConditionWidget.prototype = {
             entity_type: '',
             entity_field: '',
             operator: '',
-            value: ''
+            compare_value: ''
         };
     },
 
@@ -251,7 +321,7 @@ ConditionWidget.prototype = {
                     if (line.hasClass('condition')) {
                         var condition = self.createConditionObject();
                         condition.operator = line.find('select.condition-operator').val();
-                        condition.value = line.find('input.condition-value').val();
+                        condition.compare_value = line.find('input.condition-value').val();
                         condition.entity_type = line.find('select.entity-type').val();
                         condition.entity_field = line.find('select.entity-field').val();
                         compareObj.conditions.push(condition);
@@ -275,28 +345,49 @@ ConditionWidget.prototype = {
     },
 
     populateConditionsWidget: function(conditionsObj, targetObj) {
-        this.populateCompareTree($(this.containerEl.find('li.root.conditions')), conditionsObj);
-        this.populateCompareTree($(this.containerEl.find('li.root.actions')), targetObj);
+        this.populateCompareTree($(this.containerEl.find('li.root.conditions')), conditionsObj, 1);
+        this.populateCompareTree($(this.containerEl.find('li.root.actions')), targetObj, 1);
     },
 
-    populateCompareTree: function(el, compareObj) {
+    populateCompareTree: function(el, compareObj, depth) {
+
+        var self = this;
         if (compareObj.hasOwnProperty('conditions')) {
-            el.append(this.buildCompareControl(!el.hasClass('root')) + this.buildConditionsContainer(false));
+
+            // add the div and ul elements to the container
+            //  the div is for the logical operators: and, or, product, shipment, customer
+            //  the ul is for the conditions, condition-compares
+            el.append(this.buildCompareControl(el) + this.buildConditionsContainer(false));
+
+            // ul element from conditions container . this is created in the previous lines
             var cEl = el.find('ul.compare-conditions');
+
             for(var x = 0; x < compareObj.conditions.length; x++) {
+
                 var condition = compareObj.conditions[x];
                 if (condition.hasOwnProperty('conditions')) {
-                    var newEl = cEl.append('<li class="condition-compare"></li>');
-                    cEl.append('<li>'+this.buildAddLinks()+'</li>');
-                    return this.populateCompareTree(newEl.find('li.condition-compare'), condition);
+
+                    //console.log('compare op: ' + condition.operator + ' , conditions: ' + condition.conditions.length);
+
+                    // append li , for another compare container
+                    var newEl = cEl.append('<li class="condition-compare"></li>').find('li.condition-compare').last();
+
+                    // add a div and ul to the newly created li element
+                    self.populateCompareTree(newEl, condition, depth + 1);
                 } else {
-                    cEl.append('<li class="condition">' + this.buildCondition(condition.entity_type, condition) + '</li>');
+
+                    // add condition to list of conditions
+                    cEl.append('<li class="condition">' + this.buildCondition(condition, cEl.parent()) + '</li>');
                 }
             }
-            cEl.append('<li>'+this.buildAddLinks()+'</li>');
+
+            // add an extra link for controls
+            cEl.append('<li>'+this.buildAddLinks(depth)+'</li>');
         } else if (el.hasClass('root')) {
-            el.append(this.buildCompareControl(false) + this.buildConditionsContainer(true));
+            // if we're populating with an empty object, just populate the first part , with links
+            el.append(this.buildCompareControl(el) + this.buildConditionsContainer(true));
         }
+
         return true;
     },
 
@@ -304,6 +395,7 @@ ConditionWidget.prototype = {
         var discount = this.buildDiscount(this.containerEl);
         this.conditionInput.val(JSON.stringify(discount.condition_compare));
         this.targetInput.val(JSON.stringify(discount.action_compare));
+        return this;
     },
 
     getConditionText: function() {
