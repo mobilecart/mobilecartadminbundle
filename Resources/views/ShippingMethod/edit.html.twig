@@ -8,3 +8,26 @@
         </div>
     </div>
 {% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ConditionWidget.js') }}"></script>
+    <script type="text/javascript">
+        $(function() {
+
+            var widget = new ConditionWidget({
+                containerEl: $('{{ container }}'),
+                conditionInput: $('{{ condition_input }}'),
+                operators: {{ operators_json|raw }},
+                logicalOperators: {{ logical_operators_json|raw }},
+                containerOperators: {{ container_operators_json|raw }},
+                varSets: {{ var_sets|raw }}
+            });
+
+            $('#form-submit').click(function(e) {
+                widget.serialize();
+                return true;
+            });
+
+        });
+    </script>
+{% endblock %}

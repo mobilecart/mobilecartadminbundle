@@ -7,11 +7,22 @@ var ConditionWidget = function(info) {
     this.containerOperators = info.containerOperators;
     this.varSets = info.varSets;
     this.conditionInput = info.conditionInput;
-    this.targetInput = info.targetInput;
+
+    var targetCompareObj = {};
+    if (typeof info.targetInput != 'undefined') {
+        this.targetInput = info.targetInput;
+
+        this.targetInput.hide();
+
+        try {
+            targetCompareObj = JSON.parse(this.targetInput.val());
+        } catch(e) {
+            targetCompareObj = {};
+        }
+    }
 
     //hide widget inputs
     this.conditionInput.hide();
-    this.targetInput.hide();
 
     //insert needed markup around the inputs being wrapped
     this.insertBaseMarkup();
@@ -21,13 +32,6 @@ var ConditionWidget = function(info) {
         preCompareObj = JSON.parse(this.conditionInput.val());
     } catch(e) {
         preCompareObj = {};
-    }
-
-    var targetCompareObj = {};
-    try {
-        targetCompareObj = JSON.parse(this.targetInput.val());
-    } catch(e) {
-        targetCompareObj = {};
     }
 
     this.populateConditionsWidget(preCompareObj, targetCompareObj);
@@ -45,11 +49,13 @@ ConditionWidget.prototype = {
     varSets: {},
     currentVarSet: {},
     conditionInput: {},
-    targetInput: {},
+    //targetInput: null,
 
     insertBaseMarkup: function() {
         this.conditionInput.parent().append('<ul class="builder"><li class="condition-compare root conditions"></li></ul>');
-        this.targetInput.parent().append('<ul class="builder"><li class="condition-compare root actions"></li></ul>');
+        if (typeof this.targetInput != 'undefined') {
+            this.targetInput.parent().append('<ul class="builder"><li class="condition-compare root actions"></li></ul>');
+        }
         return this;
     },
 
@@ -394,7 +400,9 @@ ConditionWidget.prototype = {
     serialize: function() {
         var discount = this.buildDiscount(this.containerEl);
         this.conditionInput.val(JSON.stringify(discount.condition_compare));
-        this.targetInput.val(JSON.stringify(discount.action_compare));
+        if (typeof this.targetInput != 'undefined') {
+            this.targetInput.val(JSON.stringify(discount.action_compare));
+        }
         return this;
     },
 
