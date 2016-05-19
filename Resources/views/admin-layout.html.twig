@@ -26,7 +26,6 @@
     <script src="{{ asset('bundles/mobilecartadmin/js/backbone.localStorage.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartadmin/js/backbone.paginator.min.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartadmin/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/selectize.min.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartadmin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartadmin/js/global.js') }}"></script>
 
@@ -80,7 +79,7 @@
             {% block admin_menu_list %}
 
             <li>
-                <a href="#"><i class="glyphicon glyphicon-shopping-cart icon-white"></i> Catalog<span class="fa arrow fa-rotate-180"></span></a>
+                <a href="#"><i class="glyphicon glyphicon-shopping-cart icon-white"></i> &nbsp;Catalog<span class="fa arrow fa-rotate-180"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_product') }}">Products</a></li>
                     <li><a href="{{ path('cart_admin_category') }}">Categories</a></li>
@@ -88,26 +87,24 @@
             </li>
 
             <li>
+                <a href="{{ path('cart_admin_content') }}"><i class="fa fa-file-code-o fa-fw"></i> Content</a>
+            </li>
+
+            <li>
+                <a href="{{ path('cart_admin_customer') }}"><i class="fa fa-users fa-fw"></i> Customers</a>
+            </li>
+
+            <li>
                 <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Sales<span class="fa arrow fa-rotate-180"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_order') }}">Orders</a></li>
-                    <li><a href="{{ path('cart_admin_customer') }}">Customers</a></li>
                     <li><a href="{{ path('cart_admin_discount') }}">Discounts</a></li>
                     <li><a href="{{ path('cart_admin_shipping_method') }}">Shipping Method</a></li>
                 </ul>
             </li>
 
             <li>
-                <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow fa-rotate-180"></span></a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{ path('cart_admin_content') }}">Content Pages</a></li>
-                    <li><a href="{{ path('cart_admin_url_rewrite') }}">URL Rewrites</a></li>
-                </ul>
-                <!-- /.nav-second-level -->
-            </li>
-
-            <li>
-                <a href="#"><i class="fa fa-sitemap fa-fw"></i> EAV Manager<span class="fa arrow fa-rotate-180"></span></a>
+                <a href="#"><i class="fa fa-sitemap fa-fw"></i> Dynamic Fields<span class="fa arrow fa-rotate-180"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_item_var_set') }}">Variant Sets</a></li>
                     <li><a href="{{ path('cart_admin_item_var') }}">Variants</a></li>

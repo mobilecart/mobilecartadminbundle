@@ -1,0 +1,67 @@
+
+<div id="section-slot-list" class="tab-pane fade active in">
+
+    <div class="panel panel-default slot-submit-panel">
+        <div class="panel-heading">
+            <a href="#" class="slot-toggle">Add Section</a>
+
+            <a role="button" class="btn btn-default slot-toggle pull-right" href="#">
+                <span class=""><i class="glyphicon glyphicon-plus"> </i></span>
+            </a>
+        </div>
+        <div class="panel-body slot-submit-form" style="display:none;">
+
+        </div>
+    </div>
+
+    <ul class="draggable-panel list-unstyled">
+        {% for slot in slots %}
+        <li data-id="{{ slot.id }}" {% if entity.id > 0 %} data-parent-id="{{ entity.id }}"{% endif %}class="panel panel-info">
+            <div class="panel-heading">
+                {{ slot.title }}
+                <a role="button" class="btn btn-default slot-toggle pull-right" href="#">
+                    <span class=""><i class="glyphicon glyphicon-minus"> </i></span>
+                </a>
+            </div>
+            <div class="panel-body">
+
+                <div class="slot-title form-group">
+                    <label class="control-label" for="slots[{{ slot.id }}][title]">Title</label>
+                    <input name="slots[{{ slot.id }}][title]" class="form-control" value="{{ slot.title }}" />
+                </div>
+
+                {% if slot.embedcode|length > 10 %}
+                    <div class="slot-embed slot-embed-{{ slot.id }}">
+
+                    </div>
+                    <div class="slot-embed-textarea form-group">
+                        <label class="control-label" for="slots[{{ slot.id }}][embed_code]">Embed Code</label>
+                        <textarea name="slots[{{ slot.id }}][embed_code]" class="form-control">{{ slot.embedcode|raw }}</textarea>
+                    </div>
+                {% endif %}
+
+                {% if slot.url|length > 5 %}
+                    <div class="slot-image">
+                        <img class="img-responsive" src="{{ slot.url }}" />
+                    </div>
+                    <div class="slot-url form-group">
+                        <label class="control-label" for="slots[{{ slot.id }}][url]">Image URL</label>
+                        <input name="slots[{{ slot.id }}][url]" class="form-control" value="{{ slot.url }}" />
+                    </div>
+                {% endif %}
+
+                <div class="slot-bodytext form-group">
+                    <label class="control-label" for="slots[{{ slot.id }}][body_text]">Text / HTML <a href="#" class="slot-body-toggle">show/hide</a></label>
+                    <div class="slot-body-container" style="display:none;">
+                        <textarea name="slots[{{ slot.id }}][body_text]" class="form-control wysiwyg">{{ slot.bodytext }}</textarea>
+                    </div>
+                </div>
+
+                <input type="hidden" name="slots[{{ slot.id }}][content_type]" value="{{ slot.contenttype }}" />
+                <input type="hidden" name="slots[{{ slot.id }}][id]" value="{{ slot.id }}" />
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+

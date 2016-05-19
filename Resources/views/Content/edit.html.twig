@@ -1,6 +1,6 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Edit Content{% endblock %}
-{% block subheader_text %}Name: {{ entity.name }}{% endblock %}
+{% block subheader_text %}{{ entity.name }}{% endblock %}
 {% block above_form %}
     <div class="row">
         <div class="col-xs-12 header-buttons">

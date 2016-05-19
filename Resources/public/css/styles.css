@@ -96,15 +96,18 @@ body {
 
 /* ------------------------------- */
 
+
 .navbar {
     background-color: #333333;
     border-bottom-color: #222222;
 }
 
 .navbar-brand {
-    color: #337ab7 !important
+    color: #337ab7 !important;
+
 }
 
+/*
 .navbar-brand:hover {
     color: #428bca !important
 }
@@ -124,7 +127,7 @@ body {
 .navbar a:hover {
     background-color: #222222 !important
 }
-
+*/
 .dropdown-menu {
     border-bottom: 1px solid #eeeeee
 }
@@ -573,4 +576,25 @@ table.table-bordered {
 a.invalid-tab {
     color: #a94442;
     font-weight: bold;
+}
+
+.draggable-panel .panel-heading {
+    cursor: move;
+}
+
+div.media-drop {
+    margin-bottom: 10px;
+}
+
+div.slot-submit {
+    margin-bottom: 5px;
+}
+
+a.slot-toggle {
+    padding: 1px 8px;
+    margin: 0;
+}
+
+a.slot-toggle span.input-group-btn {
+    padding: 0;
 }

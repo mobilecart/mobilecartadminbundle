@@ -1,0 +1,409 @@
+<link href="{{ asset('bundles/mobilecartadmin/css/html5imageuploader/uploader-style.css') }}" rel="stylesheet" type="text/css" />
+<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/jquery.html5uploader-1.1.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/exif.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/SlotTable.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/js/jquery-sortable.js') }}"></script>
+<script type="text/javascript">
+
+    // ImageTable instance
+    var slotTable = new SlotTable({
+        bodyEl: $('div#section-slot-list table tbody')
+    });
+
+</script>
+
+<script type="text/html" id="slot-submit-form-tpl">
+
+    <div class="slot-submit text-center">
+        <button {% if entity.id > 0 %} data-parent-id="{{ entity.id }}"{% endif %} class="btn btn-success slot-submit" type="button">Save Section</button>
+        <div style="display:none;" class="text-center spinner">
+            <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+        </div>
+    </div>
+
+    <div class="slot-title form-group">
+        <label class="control-label" for="content_slot[title]">Title</label>
+        <input name="content_slot[title]" class="form-control" value="" />
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+        {% for code, label in content_types %}
+            <div class="radio">
+                <label class="radio">
+                    <input type="radio" name="content_type" value="{{ code }}" {% if code == 'image' %}checked="checked"{% endif %} /> {{ label }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    <div class="row slot-type slot-image">
+        <div class="col-sm-12">
+            <button type="button" class="btn resetupload">Upload new image</button>
+            <!-- Error message placeholder. -->
+            <p class="help-block error errormessages"></p>
+
+            <!-- Drop media element. -->
+            <div class="slot-media-drop">
+
+                <div class="dropbox media-drop-placeholder">
+                    <div class="media-drop-placeholder-uploadbutton">
+                        <input id="realUploadBtn" name="media-drop-placeholder-file" type="file" accept="image/*" tabindex="-1"/>
+                        <button id="uploadBtn" type="button" class="btn" tabindex="-1">Browse file&hellip;</button>
+                    </div>
+                    <span class="media-drop-placeholder-or">or</span>
+                    <span class="media-drop-placeholder-title">Drop Image Here</span>
+                </div>
+
+                <!-- Image placeholder. -->
+                <div class="droppedimage"></div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row slot-type slot-embed" style="display:none;">
+        <div class="col-sm-12">
+            <div class="slot-embed-textarea form-group">
+                <label class="control-label" for="content_slot[embed_code]">Embed Code</label>
+                <textarea name="content_slot[embed_code]" class="form-control"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row slot-type slot-image-url" style="display:none;">
+        <div class="col-sm-12">
+            <div class="slot-embed-textarea form-group">
+                <label class="control-label" for="content_slot[url]">Image URL</label>
+                <textarea name="content_slot[url]" class="form-control"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="slot-bodytext form-group">
+                <label class="control-label" for="content_slot[body_text]">Text / HTML</label>
+                <div class="slot-body-container">
+                    <textarea name="content_slot[body_text]" class="form-control wysiwyg"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slot-submit">
+        <button {% if entity.id > 0 %} data-parent-id="{{ entity.id }}"{% endif %} class="btn btn-success slot-submit" type="button">Save Section</button>
+        <div style="display:none;" class="spinner">
+            <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+        </div>
+    </div>
+
+</script>
+
+<script id="slot-li" type="text/html">
+
+    <li data-id="<%- slot.id %>" class="panel panel-info">
+        <div class="panel-heading">
+            <%- slot.title %>
+
+            <a role="button" class="btn btn-default slot-toggle pull-right" href="#">
+                <span class=""><i class="glyphicon glyphicon-minus"> </i></span>
+            </a>
+        </div>
+        <div class="panel-body">
+
+            <div class="slot-title form-group">
+                <label class="control-label" for="slots[<%- slot.id %>][title]">Title</label>
+                <input name="slots[<%- slot.id %>][title]" class="form-control" value="<%- slot.title %>" />
+            </div>
+
+            <% if (slot.embed_code.length > 10) { %>
+            <div class="slot-embed slot-embed-<%- slot.id %>">
+
+            </div>
+            <div class="slot-embed-textarea form-group">
+                <label class="control-label" for="slots[<%- slot.id %>][embed_code]">Embed Code</label>
+                <textarea name="slots[<%- slot.id %>][embed_code]" class="form-control"><%- slot.embed_code %></textarea>
+            </div>
+            <% } %>
+
+            <% if (slot.url.length > 5) { %>
+            <div class="slot-image">
+                <img class="img-responsive" src="<%- slot.url %>" />
+            </div>
+            <div class="slot-url form-group">
+                <label class="control-label" for="slots[<%- slot.id %>][url]">Image URL</label>
+                <input name="slots[<%- slot.id %>][url]" class="form-control" value="<%- slot.url %>" />
+            </div>
+            <% } %>
+
+            <div class="slot-bodytext form-group">
+                <label class="control-label" for="slots[<%- slot.id %>][body_text]">Text / HTML <a href="#" class="slot-body-toggle">show/hide</a></label>
+                <div class="slot-body-container" style="display:none;">
+                    <textarea name="slots[<%- slot.id %>][body_text]" class="form-control wysiwyg"><%- slot.body_text %></textarea>
+                </div>
+            </div>
+
+            <input type="hidden" name="slots[<%- slot.id %>][content_type]" value="<%- slot.content_type %>" />
+            <input type="hidden" name="slots[<%- slot.id %>][id]" value="<%- slot.id %>" />
+        </div>
+    </li>
+
+</script>
+
+<script type="text/javascript">
+
+    function resetSlotSubmit() {
+        var html = $('#slot-submit-form-tpl').html();
+        $('div.slot-submit-form').html(html);
+    }
+
+    function addSlot(slot) {
+        var panelList = $('.draggable-panel');
+        var tplEl = $('#slot-li');
+        var tpl = _.template(tplEl.html());
+        panelList.prepend(tpl(slot));
+    }
+
+    function attachSlotEvents() {
+        var panelList = $('.draggable-panel');
+
+        panelList.sortable({
+            // Only make the .panel-heading child elements support dragging.
+            // Omit this to make then entire <li>...</li> draggable.
+            handle: '.panel-heading',
+            update: function() {
+                $('.panel', panelList).each(function(index, elem) {
+                    var $listItem = $(elem),
+                            newIndex = $listItem.index();
+
+                    // Persist the new indices.
+                });
+            }
+        });
+
+        $('input[name="content_type"]').change(function(){
+            var self = $(this);
+            var elClass = 'slot-' + self.val();
+            $('div.slot-type').hide();
+            $('div.' + elClass).show();
+        });
+
+        $('textarea.wysiwyg').each(function(){
+            var self = $(this);
+            var editor = new Simditor({
+                textarea: self,
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|']
+            });
+        });
+
+        $('a.slot-toggle').click(function(e){
+            e.preventDefault();
+            var self = $(this);
+            self.parent().parent().find('div.panel-body').toggle();
+            var icon = self.parent().find('i.glyphicon');
+            if (icon.hasClass('glyphicon-minus')) {
+                icon.removeClass('glyphicon-minus');
+                icon.addClass('glyphicon-plus');
+            } else {
+                icon.removeClass('glyphicon-plus');
+                icon.addClass('glyphicon-minus');
+            }
+        });
+
+        $('button.slot-submit').click(function(e){
+            var self = $(this);
+            self.hide();
+            self.parent().find('.spinner').show();
+
+            var submitDiv = $('div.slot-submit-form');
+            var postData = {};
+
+            submitDiv.find('input, textarea').each(function(){
+                var input = $(this);
+                postData[input.attr('name')] = input.val();
+            });
+
+            var action = '{{ path('cart_admin_content_slot_create') }}' + '?format=json'; // insert
+            var rowId = self.attr('data-id');
+            if (typeof rowId != 'undefined') {
+                postData['content_slot[id]'] = rowId;
+                action = '{{ path('cart_admin_content_slot_update', {'id': entity.id}) }}'+ '?format=json'; // update
+            }
+
+            var parentId = self.attr('data-parent-id');
+            if (typeof parentId != 'undefined') {
+                postData['content_slot[parent]'] = parentId;
+            }
+
+            // post
+            $.ajax({
+                url: action,
+                method: 'POST',
+                dataType: 'json',
+                data: postData
+            }).done(function(response){
+
+                addSlot(response.entity);
+                // resetSlotSubmit();
+            });
+
+            return false;
+        });
+    }
+
+    $(function(){
+        resetSlotSubmit();
+    });
+
+</script>
+
+<script type="text/javascript">
+$(function(){
+
+    $('.slot-media-drop').each(function(){
+
+        var dropper = $(this);
+
+        var parentEl = dropper.parent();
+
+        var settings = dropper.html5Uploader({
+
+            parent: parentEl,
+            postUrl: '{{ path('cart_admin_image_upload_slot') }}', // add parameters here
+            imageUrl: '{{ path('cart_admin_image') }}',
+
+            /**
+             * File dropped / selected.
+             */
+            onDropped: function(success) {
+                var self = this;
+
+                if (!success) {
+                    self.parent.find('.errormessages').text('Only allowed are jpg, png or gif images.');
+                } else {
+                    self.parent.find('.errormessages').empty();
+                    self.parent.find('.media-drop-placeholder > *').hide();
+                    self.parent.find('.media-drop-placeholder').toggleClass('busyloading', true).css('cursor', 'progress');
+                }
+            },
+
+            /**
+             * Image cropped and scaled.
+             */
+            onProcessed: function(canvas) {
+                var self = this;
+
+                if (canvas) {
+
+                    // Remove possible previously loaded image.
+                    var url = canvas.toDataURL();
+                    var newImg = document.createElement("img");
+                    newImg.src = url;
+
+                    // Show new image.
+                    self.parent.find('.droppedimage').empty().append(newImg);
+
+                    // Hide dropbox.
+                    self.parent.find('.dropbox').hide();
+
+                    // Button to reset upload box.
+                    self.parent.find('.resetupload').show();
+
+                    // Reset dropbox for reuse.
+                    self.parent.find('.errormessages').empty();
+                    self.parent.find('.media-drop-placeholder > *').show();
+                    self.parent.find('.media-drop-placeholder').toggleClass('busyloading', false).css('cursor', 'auto');
+                }
+            },
+
+            /**
+             * Image uploaded.
+             *
+             * @param success boolean True indicates success
+             * @param response Object from parsed JSON
+             */
+            onUploaded: function(success, response) {
+
+                console.log(response);
+
+                if (success) {
+
+                    // add to list in list tab
+                    //imageTable.add(response);
+
+                    var rowId = response.id;
+                    $('button.slot-submit').each(function(){
+                        var btn = $(this);
+                        btn.attr('data-id', rowId);
+                    });
+
+                    modalWidget.setLabel('Success');
+                } else {
+                    modalWidget.setLabel('Error');
+                }
+                modalWidget.setBody(response.message);
+                $('#modal-shared').modal('show');
+            },
+
+            /**
+             * Progress during upload.
+             *
+             * @param progress Number Progress percentage
+             */
+            onUploadProgress: function(progress) {
+                //window.console && console.log('Upload progress: ' + progress);
+            }
+        });
+
+        // Target image size selection.
+        parentEl.find('input[name="targetsize"]').on('change', function() {
+            var self = $(this);
+            //var val = self.val();
+            var width = self.attr('data-width');
+            var height = self.attr('data-height');
+            //var code = self.attr('data-code');
+            settings.cropRatio = width / height;
+            //$('#dropbox').css('width', width + 'px').css('height', height + 'px');
+        });
+
+        //
+        parentEl.find('.resetupload').hide().on('click', function(){
+            var self = $(this);
+            parentEl.find('.droppedimage').empty();
+            parentEl.find('.dropbox').show();
+            self.hide();
+        });
+
+    });
+
+});
+</script>
+
+<link href="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/styles/simditor.css') }}" rel="stylesheet" type="text/css" />
+<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/module.min.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/uploader.min.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/hotkeys.min.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/simditor.min.js') }}"></script>
+
+<script type="text/javascript">
+$(function(){
+    attachSlotEvents();
+});
+</script>
+
+{# Let page load quickly and add embed after #}
+{% for slot in slots %}
+    {% if slot.embedcode|length > 10 %}
+
+    <script id="slot-embed-tpl-{{ slot.id }}" type="text/html">
+        {{ slot.embedcode|raw }}
+    </script>
+
+    <script type="text/javascript">
+        $(function(){
+            var html = $('#slot-embed-tpl-{{ slot.id }}').html();
+            $('div.slot-embed-{{ slot.id }}').append(html);
+        });
+    </script>
+
+    {% endif %}
+{% endfor %}
