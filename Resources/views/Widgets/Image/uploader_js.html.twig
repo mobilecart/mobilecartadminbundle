@@ -19,7 +19,7 @@
 
         var settings = self.html5Uploader({
 
-            //parent: parentEl,
+            parent: parentEl,
             postUrl: '{{ path('cart_admin_image_upload') }}' + '{{ upload_query|raw }}', // add parameters here
             imageUrl: '{{ path('cart_admin_image') }}',
 
