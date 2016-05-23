@@ -30,7 +30,7 @@
                     self.parent.find('.errormessages').text('Images allowed are jpg, png or gif images.');
                 } else {
 
-                    var sizeInput = $('input[name="targetsize"]');
+                    var sizeInput = self.parent.find('input[name="targetsize"]:checked');
                     var code = sizeInput.attr('data-code');
                     settings.postUrl = self.postUrl + '&image_code=' + code;
 
