@@ -33,7 +33,7 @@
                     self.parent.find('.errormessages').text('Images allowed are jpg, png or gif images.');
                 } else {
 
-                    var sizeInput = parentEl.find('input[name="targetsize"]:checked');
+                    var sizeInput = imageSection.find('input[name="targetsize"]:checked');
                     var code = sizeInput.attr('data-code');
                     settings.postUrl = self.postUrl + '&image_code=' + code;
 
