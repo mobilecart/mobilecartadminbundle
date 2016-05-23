@@ -3,11 +3,13 @@
 
     <div class="panel panel-default slot-submit-panel">
         <div class="panel-heading">
-            <a href="#" class="slot-toggle">Add Section</a>
 
-            <a role="button" class="btn btn-default slot-toggle pull-right" href="#">
+            <a role="button" class="btn btn-default slot-toggle pull-left" href="#">
                 <span class=""><i class="glyphicon glyphicon-plus"> </i></span>
             </a>
+            &nbsp;
+            Add Section
+
         </div>
         <div class="panel-body slot-submit-form" style="display:none;">
 
@@ -18,12 +20,16 @@
         {% for slot in slots %}
         <li data-id="{{ slot.id }}" {% if entity.id > 0 %} data-parent-id="{{ entity.id }}"{% endif %}class="panel panel-info">
             <div class="panel-heading">
-                {{ slot.title }}
-                <a role="button" class="btn btn-default slot-toggle pull-right" href="#">
-                    <span class=""><i class="glyphicon glyphicon-minus"> </i></span>
+
+                <a role="button" class="btn btn-default slot-toggle pull-left" href="#">
+                    <span class=""><i class="glyphicon glyphicon-plus"> </i></span>
                 </a>
+                &nbsp;
+                {{ slot.title }}
+
+                <a href="#" class="pull-right slot-trash"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" style="display: none;">
 
                 <div class="slot-title form-group">
                     <label class="control-label" for="slots[{{ slot.id }}][title]">Title</label>
@@ -47,6 +53,12 @@
                     <div class="slot-url form-group">
                         <label class="control-label" for="slots[{{ slot.id }}][url]">Image URL</label>
                         <input name="slots[{{ slot.id }}][url]" class="form-control" value="{{ slot.url }}" />
+                    </div>
+                {% endif %}
+
+                {% if slot.path|length > 3 %}
+                    <div class="slot-image">
+                        <img class="img-responsive" src="{{ asset(slot.path) }}" />
                     </div>
                 {% endif %}
 

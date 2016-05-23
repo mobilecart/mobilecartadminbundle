@@ -592,9 +592,10 @@ div.slot-submit {
 
 a.slot-toggle {
     padding: 1px 8px;
-    margin: 0;
+    margin: 0 5px 0 0;
 }
 
 a.slot-toggle span.input-group-btn {
     padding: 0;
 }
+
