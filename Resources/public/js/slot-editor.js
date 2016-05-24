@@ -40,14 +40,6 @@ SlotEditor.prototype = {
             }
         });
 
-        widget.container.find('input[name="content_slot[content_type]"]').change(function(){
-            var self = $(this);
-            var elClass = 'slot-' + self.val();
-            $('div.slot-type').hide();
-            $('div.' + elClass).show();
-            return true;
-        });
-
         widget.container.find('textarea.wysiwyg').each(function(){
             var self = $(this);
             var editor = new Simditor({
@@ -105,71 +97,6 @@ SlotEditor.prototype = {
             self.parent().parent().find('div.slot-body-container').toggle();
         });
 
-        widget.container.find('button.slot-submit').click(function(e){
-            var self = $(this);
-            self.hide();
-            self.parent().find('.spinner').show();
-
-            var submitDiv = $('div.slot-submit-form');
-            var postData = widget.postData;
-
-            submitDiv.find('input, textarea').each(function(){
-                var input = $(this);
-
-                switch(input.attr('name')) {
-                    case 'content_slot[path]':
-                        // no-op
-                        break;
-                    case 'content_slot[content_type]':
-                        if (typeof postData.content_type == 'undefined') {
-                            input = submitDiv.find('input[name="content_slot[content_type]"]');
-                            postData[input.attr('name')] = input.val();
-                        }
-                        break;
-                    default:
-                        postData[input.attr('name')] = input.val();
-                        break;
-                }
-
-            });
-
-            var action = widget.insertAction; // insert
-            var rowId = self.attr('data-id');
-            if (typeof rowId != 'undefined') {
-                // Note : We cannot generate a link before we have an ID , so we do a string replace
-                action = widget.updateAction; // update
-                action = action.replace('1234', rowId);
-                postData['_method'] = 'PUT';
-            }
-
-            var parentId = self.attr('data-parent-id');
-            if (typeof parentId != 'undefined') {
-                postData['content_slot[parent_id]'] = parentId;
-            }
-
-            // post
-            $.ajax({
-                url: action,
-                method: 'POST',
-                dataType: 'json',
-                data: postData
-            }).done(function(response){
-
-                if (response.success == 1) {
-
-                    widget.postData = {};
-
-                    // add the new slot to the list of current slots, and attach events
-                    widget.addSlot(response.entity);
-
-                    // reset slot submit area
-                    widget.resetSlotSubmit();
-                    widget.attachSlotSubmitEvents();
-                }
-            });
-
-            return false;
-        });
     },
     resetSlotSubmit: function() {
         var html = $('#slot-submit-form-tpl').html();
@@ -179,7 +106,7 @@ SlotEditor.prototype = {
     attachSlotSubmitEvents: function() {
         var widget = this;
 
-        $('.slot-media-drop').each(function(){
+        widget.find('.slot-media-drop').each(function(){
 
             var dropper = $(this);
 
@@ -294,60 +221,6 @@ SlotEditor.prototype = {
             });
 
         });
-    },
-    addSlot: function(slot) {
-        var widget = this;
-
-        var panelList = $('.draggable-panel');
-        var tplEl = $('#slot-li');
-        var tpl = _.template(tplEl.html());
-        panelList.prepend(tpl(slot));
-        var li = panelList.find('li[data-id="' + slot.id + '"]');
-
-        // reset minimize/maximize button
-        panelList.sortable({
-            // Only make the .panel-heading child elements support dragging.
-            // Omit this to make then entire <li>...</li> draggable.
-            handle: '.panel-heading',
-            update: function() {
-                $('.panel', panelList).each(function(index, elem) {
-                    var $listItem = $(elem),
-                        newIndex = $listItem.index();
-
-                    // Persist the new indices.
-                });
-            }
-        });
-
-        // reset simditor
-        li.find('textarea.wysiwyg').each(function(){
-            var self = $(this);
-            var editor = new Simditor({
-                textarea: self,
-                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|']
-            });
-        });
-
-        // reset show/hide link
-        li.find('a.slot-toggle').click(function(e){
-            e.preventDefault();
-            var self = $(this);
-            self.parent().parent().find('div.panel-body').toggle();
-            var icon = self.parent().find('i.glyphicon');
-            if (icon.hasClass('glyphicon-minus')) {
-                icon.removeClass('glyphicon-minus');
-                icon.addClass('glyphicon-plus');
-            } else {
-                icon.removeClass('glyphicon-plus');
-                icon.addClass('glyphicon-minus');
-            }
-        });
-
-        li.find('a.slot-body-toggle').click(function(e){
-            e.preventDefault();
-            var self = $(this);
-            self.parent().parent().find('div.slot-body-container').toggle();
-        });
 
         widget.container.find('button.slot-submit').click(function(e){
             var self = $(this);
@@ -415,7 +288,97 @@ SlotEditor.prototype = {
             return false;
         });
 
+        widget.container.find('input[name="content_slot[content_type]"]').change(function(){
+            var self = $(this);
+            var elClass = 'slot-' + self.val();
+            $('div.slot-type').hide();
+            $('div.' + elClass).show();
+            return true;
+        });
+    },
+    addSlot: function(slot) {
+        var widget = this;
+
+        var panelList = $('.draggable-panel');
+        var tplEl = $('#slot-li');
+        var tpl = _.template(tplEl.html());
+        panelList.prepend(tpl(slot));
+        var li = panelList.find('li[data-id="' + slot.id + '"]');
+
+        // reset minimize/maximize button
+        panelList.sortable({
+            // Only make the .panel-heading child elements support dragging.
+            // Omit this to make then entire <li>...</li> draggable.
+            handle: '.panel-heading',
+            update: function() {
+                $('.panel', panelList).each(function(index, elem) {
+                    var $listItem = $(elem),
+                        newIndex = $listItem.index();
+
+                    // Persist the new indices.
+                });
+            }
+        });
+
+        // reset simditor
+        li.find('textarea.wysiwyg').each(function(){
+            var self = $(this);
+            var editor = new Simditor({
+                textarea: self,
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|']
+            });
+        });
+
+        // reset show/hide link
+        li.find('a.slot-toggle').click(function(e){
+            e.preventDefault();
+            var self = $(this);
+            self.parent().parent().find('div.panel-body').toggle();
+            var icon = self.parent().find('i.glyphicon');
+            if (icon.hasClass('glyphicon-minus')) {
+                icon.removeClass('glyphicon-minus');
+                icon.addClass('glyphicon-plus');
+            } else {
+                icon.removeClass('glyphicon-plus');
+                icon.addClass('glyphicon-minus');
+            }
+        });
+
+        li.find('a.slot-body-toggle').click(function(e){
+            e.preventDefault();
+            var self = $(this);
+            self.parent().parent().find('div.slot-body-container').toggle();
+        });
+
         // reset remove link
+        li.find('a.slot-trash').click(function(e){
+            e.preventDefault();
+            var self = $(this);
+            var slotId = self.parent().parent().attr('data-id');
+            if (slotId > 0) {
+
+                // delete slot and row from html
+
+                var action = widget.deleteAction;
+                action = action.replace('1234', slotId);
+
+                var postData = {};
+                postData['_method'] = 'DELETE';
+
+                $.ajax({
+                    url: action,
+                    method: 'POST',
+                    data: postData,
+                    dataType: 'json'
+                }).done(function(response){
+                    if (response.success == 1) {
+                        widget.container.find('li[data-id="' + slotId + '"]').remove();
+                    }
+                });
+
+            }
+            return false;
+        });
 
         return this;
     }
