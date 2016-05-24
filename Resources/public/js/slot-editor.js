@@ -40,7 +40,7 @@ SlotEditor.prototype = {
             }
         });
 
-        $('input[name="content_slot[content_type]"]').change(function(){
+        widget.container.find('input[name="content_slot[content_type]"]').change(function(){
             var self = $(this);
             var elClass = 'slot-' + self.val();
             $('div.slot-type').hide();
@@ -48,7 +48,7 @@ SlotEditor.prototype = {
             return true;
         });
 
-        $('textarea.wysiwyg').each(function(){
+        widget.container.find('textarea.wysiwyg').each(function(){
             var self = $(this);
             var editor = new Simditor({
                 textarea: self,
@@ -56,7 +56,7 @@ SlotEditor.prototype = {
             });
         });
 
-        $('a.slot-trash').click(function(e){
+        widget.container.find('a.slot-trash').click(function(e){
             e.preventDefault();
             var self = $(this);
             var slotId = self.parent().parent().attr('data-id');
@@ -85,7 +85,7 @@ SlotEditor.prototype = {
             return false;
         });
 
-        $('a.slot-toggle').click(function(e){
+        widget.container.find('a.slot-toggle').click(function(e){
             e.preventDefault();
             var self = $(this);
             self.parent().parent().find('div.panel-body').toggle();
@@ -99,13 +99,13 @@ SlotEditor.prototype = {
             }
         });
 
-        $('a.slot-body-toggle').click(function(e){
+        widget.container.find('a.slot-body-toggle').click(function(e){
             e.preventDefault();
             var self = $(this);
             self.parent().parent().find('div.slot-body-container').toggle();
         });
 
-        $('button.slot-submit').click(function(e){
+        widget.container.find('button.slot-submit').click(function(e){
             var self = $(this);
             self.hide();
             self.parent().find('.spinner').show();
@@ -347,6 +347,72 @@ SlotEditor.prototype = {
             e.preventDefault();
             var self = $(this);
             self.parent().parent().find('div.slot-body-container').toggle();
+        });
+
+        widget.container.find('button.slot-submit').click(function(e){
+            var self = $(this);
+            self.hide();
+            self.parent().find('.spinner').show();
+
+            var submitDiv = $('div.slot-submit-form');
+            var postData = widget.postData;
+
+            submitDiv.find('input, textarea').each(function(){
+                var input = $(this);
+
+                switch(input.attr('name')) {
+                    case 'content_slot[path]':
+                        // no-op
+                        break;
+                    case 'content_slot[content_type]':
+                        if (typeof postData.content_type == 'undefined') {
+                            input = submitDiv.find('input[name="content_slot[content_type]"]');
+                            postData[input.attr('name')] = input.val();
+                        }
+                        break;
+                    default:
+                        postData[input.attr('name')] = input.val();
+                        break;
+                }
+
+            });
+
+            var action = widget.insertAction; // insert
+            var rowId = self.attr('data-id');
+            if (typeof rowId != 'undefined') {
+                // Note : We cannot generate a link before we have an ID , so we do a string replace
+                action = widget.updateAction; // update
+                action = action.replace('1234', rowId);
+                postData['_method'] = 'PUT';
+            }
+
+            var parentId = self.attr('data-parent-id');
+            if (typeof parentId != 'undefined') {
+                postData['content_slot[parent_id]'] = parentId;
+            }
+
+            // post
+            $.ajax({
+                url: action,
+                method: 'POST',
+                dataType: 'json',
+                data: postData
+            }).done(function(response){
+
+                if (response.success == 1) {
+
+                    widget.postData = {};
+
+                    // add the new slot to the list of current slots, and attach events
+                    widget.addSlot(response.entity);
+
+                    // reset slot submit area
+                    widget.resetSlotSubmit();
+                    widget.attachSlotSubmitEvents();
+                }
+            });
+
+            return false;
         });
 
         // reset remove link
