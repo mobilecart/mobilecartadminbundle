@@ -106,7 +106,7 @@ SlotEditor.prototype = {
     attachSlotSubmitEvents: function() {
         var widget = this;
 
-        widget.find('.slot-media-drop').each(function(){
+        widget.container.find('.slot-media-drop').each(function(){
 
             var dropper = $(this);
 
