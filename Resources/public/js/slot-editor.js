@@ -42,9 +42,11 @@ SlotEditor.prototype = {
 
         widget.container.find('textarea.wysiwyg').each(function(){
             var self = $(this);
+
+            Simditor.locale = 'en-US';
             var editor = new Simditor({
                 textarea: self,
-                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link'],
             });
         });
 
@@ -323,6 +325,7 @@ SlotEditor.prototype = {
         // reset simditor
         li.find('textarea.wysiwyg').each(function(){
             var self = $(this);
+            Simditor.locale = 'en-US';
             var editor = new Simditor({
                 textarea: self,
                 toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
