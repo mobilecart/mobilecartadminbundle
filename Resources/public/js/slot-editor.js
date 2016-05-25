@@ -44,7 +44,7 @@ SlotEditor.prototype = {
             var self = $(this);
             var editor = new Simditor({
                 textarea: self,
-                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|']
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
             });
         });
 
@@ -325,7 +325,7 @@ SlotEditor.prototype = {
             var self = $(this);
             var editor = new Simditor({
                 textarea: self,
-                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|']
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
             });
         });
 
