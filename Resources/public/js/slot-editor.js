@@ -239,7 +239,7 @@ SlotEditor.prototype = {
                         break;
                     case 'content_slot[content_type]':
                         if (typeof postData.content_type == 'undefined') {
-                            input = submitDiv.find('input[name="content_slot[content_type]"]');
+                            input = submitDiv.find('input[name="content_slot[content_type]"]:checked');
                             postData[input.attr('name')] = input.val();
                         }
                         break;
