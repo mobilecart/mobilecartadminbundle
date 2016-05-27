@@ -10,7 +10,7 @@ ImageTable.prototype = {
         var html = '';
 
         html += '<tr data-id="' + obj.id + '">' +
-            '<td><input type="checkbox" /></td>' +
+            '<td><a href="#" class="image-remove-btn"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>' +
             '<td>' + obj.width + ' x ' + obj.height + '</td>' +
             '<td>' + obj.code + '</td>' +
             '<td><input type="number" class="image-sort-order" value="1" /></td>' +

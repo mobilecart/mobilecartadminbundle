@@ -128,4 +128,12 @@
         });
     });
 
+    $('div#section-image-list').on('click', 'a.image-remove-btn', function(e) {
+        e.preventDefault();
+        var self = $(this);
+        var trEl = self.parent().parent();
+        trEl.remove();
+        return false;
+    });
+
 </script>

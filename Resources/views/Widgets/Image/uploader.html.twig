@@ -24,7 +24,7 @@
                 <tbody>
                     {% for image in images %}
                     <tr data-id="{{ image.getId() }}">
-                        <td><input type="checkbox" /></td>
+                        <td><a href="#" class="image-remove-btn"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
                         <td>{{ image.getWidth() }} x {{ image.getHeight() }}</td>
                         <td>{{ image.getCode() }}</td>
                         <td><input type="number" class="image-sort-order" value="{{ image.getSortOrder() }}" /></td>
