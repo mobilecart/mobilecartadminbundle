@@ -78,7 +78,9 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="slot-bodytext form-group">
-                <label class="control-label" for="content_slot[body_text]">Text / HTML</label>
+                <label class="control-label" for="content_slot[body_text]">Text / HTML
+                    <a href="#" class="slot-body-wysiwyg-toggle">plain text</a>
+                </label>
                 <div class="slot-body-container">
                     <textarea name="content_slot[body_text]" class="form-control wysiwyg"></textarea>
                 </div>
@@ -118,7 +120,7 @@
 
             <% if (embed_code != null && embed_code.length > 10) { %>
             <div class="slot-embed slot-embed-<%- id %>">
-                <%- embed_code %>
+                <%= embed_code %>
             </div>
             <div class="slot-embed-textarea form-group">
                 <label class="control-label" for="slots[<%- id %>][embed_code]">Embed Code</label>
@@ -143,7 +145,10 @@
             <% } %>
 
             <div class="slot-bodytext form-group">
-                <label class="control-label" for="slots[<%- id %>][body_text]">Text / HTML <a href="#" class="slot-body-toggle">show/hide</a></label>
+                <label class="control-label" for="slots[<%- id %>][body_text]">Text / HTML
+                    <a href="#" class="slot-body-toggle">show</a>
+                    &nbsp; | &nbsp;
+                    <a href="#" class="slot-body-wysiwyg-toggle">plain text</a></label>
                 <div class="slot-body-container">
                     <textarea name="slots[<%- id %>][body_text]" class="form-control wysiwyg"><%- body_text %></textarea>
                 </div>
