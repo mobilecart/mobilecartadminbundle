@@ -42,11 +42,21 @@ SlotEditor.prototype = {
 
         widget.container.find('textarea.wysiwyg').each(function(){
             var self = $(this);
+            var container = self.parent().parent();
 
             Simditor.locale = 'en-US';
             var editor = new Simditor({
                 textarea: self,
-                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link'],
+                toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
+            });
+
+            container.find('a.slot-body-wysiwyg-toggle').click(function(e){
+                e.preventDefault();
+                var link = $(this);
+                editor.destroy();
+                link.remove();
+                container.find('textarea.wysiwyg').show();
+                return false;
             });
         });
 
@@ -96,7 +106,13 @@ SlotEditor.prototype = {
         widget.container.find('a.slot-body-toggle').click(function(e){
             e.preventDefault();
             var self = $(this);
-            self.parent().parent().find('div.slot-body-container').toggle();
+            var el = self.parent().parent().find('div.slot-body-container');
+            el.toggle();
+            if (el.is(':visible')) {
+                self.html('hide');
+            } else {
+                self.html('show');
+            }
         });
 
     },
@@ -325,10 +341,21 @@ SlotEditor.prototype = {
         // reset simditor
         li.find('textarea.wysiwyg').each(function(){
             var self = $(this);
+            var container = self.parent().parent();
+
             Simditor.locale = 'en-US';
             var editor = new Simditor({
                 textarea: self,
                 toolbar: ['bold', 'italic', 'underline', 'color', '|', 'ol', 'ul', '|', 'link']
+            });
+
+            container.find('a.slot-body-wysiwyg-toggle').click(function(e){
+                e.preventDefault();
+                var link = $(this);
+                editor.destroy();
+                link.remove();
+                container.find('textarea.wysiwyg').show();
+                return false;
             });
         });
 
@@ -350,7 +377,13 @@ SlotEditor.prototype = {
         li.find('a.slot-body-toggle').click(function(e){
             e.preventDefault();
             var self = $(this);
-            self.parent().parent().find('div.slot-body-container').toggle();
+            var el = self.parent().parent().find('div.slot-body-container');
+            el.toggle();
+            if (el.is(':visible')) {
+                self.html('hide');
+            } else {
+                self.html('show');
+            }
         });
 
         // reset remove link

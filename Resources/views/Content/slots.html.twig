@@ -63,7 +63,11 @@
                 {% endif %}
 
                 <div class="slot-bodytext form-group">
-                    <label class="control-label" for="slots[{{ slot.id }}][body_text]">Text / HTML <a href="#" class="slot-body-toggle">show/hide</a></label>
+                    <label class="control-label" for="slots[{{ slot.id }}][body_text]">Text / HTML
+                        <a href="#" class="slot-body-toggle">show</a>
+                        &nbsp; | &nbsp;
+                        <a href="#" class="slot-body-wysiwyg-toggle">plain text</a>
+                    </label>
                     <div class="slot-body-container" style="display:none;">
                         <textarea name="slots[{{ slot.id }}][body_text]" class="form-control wysiwyg">{{ slot.bodytext }}</textarea>
                     </div>
