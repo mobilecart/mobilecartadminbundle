@@ -44,7 +44,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ path('cart_admin_dashboard') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+            <span class="navbar-brand">mobilecart.io</span>
         </div>
         {% block navigation %}
         <div class="collapse navbar-collapse navbar-collapse">
@@ -77,9 +77,11 @@
         <ul class="nav" id="side-menu">
 
             {% block admin_menu_list %}
-
             <li>
-                <a href="#"><i class="glyphicon glyphicon-shopping-cart icon-white"></i> &nbsp;Catalog<span class="fa arrow fa-rotate-180"></span></a>
+                <a href="{{ path('cart_admin_dashboard') }}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="#"><i class="glyphicon glyphicon-shopping-cart icon-white"></i> &nbsp;Catalog<span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_product') }}">Products</a></li>
                     <li><a href="{{ path('cart_admin_category') }}">Categories</a></li>
@@ -95,7 +97,7 @@
             </li>
 
             <li>
-                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Sales<span class="fa arrow fa-rotate-180"></span></a>
+                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Sales<span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_order') }}">Orders</a></li>
                     <li><a href="{{ path('cart_admin_discount') }}">Discounts</a></li>
@@ -104,13 +106,13 @@
             </li>
 
             <li>
-                <a href="#"><i class="fa fa-sitemap fa-fw"></i> Dynamic Fields<span class="fa arrow fa-rotate-180"></span></a>
+                <a href="#"><i class="fa fa-sitemap fa-fw"></i> Custom Fields<span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li><a href="{{ path('cart_admin_item_var_set') }}">Variant Sets</a></li>
-                    <li><a href="{{ path('cart_admin_item_var') }}">Variants</a></li>
-                    <li><a href="{{ path('cart_admin_item_var_set_var') }}">Variant Set Maps</a></li>
+                    <li><a href="{{ path('cart_admin_item_var_set') }}">Field Sets</a></li>
+                    <li><a href="{{ path('cart_admin_item_var') }}">Fields</a></li>
+                    <li><a href="{{ path('cart_admin_item_var_set_var') }}">Field Set Maps</a></li>
                     <li>
-                        <a href="#">Variant Options <span class="fa arrow fa-rotate-180"></span></a>
+                        <a href="#">Field Options <span class="fa arrow"></span></a>
                         <ul class="nav nav-third-level">
                             <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'datetime'}) }}">Datetime</a></li>
                             <li><a href="{{ path('cart_admin_item_var_option', {'datatype':'decimal'}) }}">Decimal</a></li>

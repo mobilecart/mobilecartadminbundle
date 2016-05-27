@@ -1,5 +1,5 @@
 {% extends templatePath('Widgets/Template:index.html.twig', 'admin') %}
-{% block header_text %}Variant Options{% endblock %}
+{% block header_text %}Custom Field Options{% endblock %}
 {% block form_action %}{{ path('cart_admin_item_var_option') }}{% endblock %}
 {% block header_buttons %}
     <a class="btn btn-success" href="{{ path('cart_admin_item_var_option_new', {'datatype': app.request.get('datatype')}) }}">Create</a>

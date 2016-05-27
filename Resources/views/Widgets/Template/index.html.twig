@@ -5,7 +5,7 @@
     {% if result.facetCounts|length > 0 %}
     <li>
 
-        <a href="#"><i class="glyphicon glyphicon-th-list"></i> Choice Filters<span class="fa arrow fa-rotate-180"></span></a>
+        <a href="#"><i class="glyphicon glyphicon-th-list"></i> Custom Filters<span class="fa arrow"></span></a>
         <ul class="nav nav-second-level collapse">
 
     {% if result.facetFilters is defined %}
@@ -79,7 +79,7 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-sm-3">
-                                <a href="#filterPanel" class="pull-left btn btn-default collapsed" data-parent="#accordion" data-toggle="collapse">Basic Filters</a>
+                                <a href="#filterPanel" class="pull-left btn btn-default collapsed" data-parent="#accordion" data-toggle="collapse">Filters</a>
                             </div>
                             <div class="col-sm-6">
                                 <div class="input-group">
@@ -105,7 +105,7 @@
                     </div>
 
                     <!-- Filters -->
-                    <div id="filterPanel" class="panel-body panel-collapse collapse">
+                    <div id="filterPanel" class="panel-body panel-collapse {% if search.advFilters is defined and search.advFilters|length > 0 %}in{% else %}collapse{% endif %}">
                         <div id="filters-container">
 
                     {% if search.advFilters is defined and search.advFilters|length > 0 %}
