@@ -29,7 +29,7 @@ body {
         border-left: 1px solid #e7e7e7;
     }
 }
-
+.navbar-nav.navbar-right:last-child { margin-right:0; }
 .navbar-static-side {
     background-color: #333333;
     border-bottom-color: #222222;
