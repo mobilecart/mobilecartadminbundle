@@ -228,10 +228,14 @@ App.Customer.views.CustomerView = Backbone.View.extend({
         var customer = this.model.toJSON();
         var customerId = customer.id;
 
-        if (self.selected.indexOf(customerId) > -1) {
+        if (typeof self.selected != 'undefined' && typeof self.selected == 'object' && self.selected.indexOf(customerId) > -1) {
             customer.checked = 1;
         } else {
             customer.checked = 0;
+        }
+
+        if (typeof self.selected == 'number' && self.selected == customerId) {
+            customer.checked = 1;
         }
 
         this.$el.html(this.template(customer));

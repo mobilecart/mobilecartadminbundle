@@ -203,7 +203,7 @@ App.Discount.views.DiscountView = Backbone.View.extend({
         var discount = this.model.toJSON();
         var discountId = discount.id;
 
-        if (self.selected.indexOf(discountId) > -1) {
+        if (typeof self.selected != 'undefined' && self.selected.indexOf(discountId) > -1) {
             discount.checked = 1;
         } else {
             discount.checked = 0;
