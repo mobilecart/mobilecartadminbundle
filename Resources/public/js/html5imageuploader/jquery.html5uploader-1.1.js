@@ -113,10 +113,9 @@
         function startProcess(fileOrUrl) {
             var callback = function () {
                 var canvas = scaleAndCropImage(this);
-                var blob = convertCanvasToBlob(canvas);
-
-                // Upload to server.
-                realUploadImage(blob);
+                uploadBase64(canvas.toDataURL());
+                //var blob = convertCanvasToBlob(canvas);
+                //realUploadImage(blob);
             };
 
             var success = false;
@@ -297,6 +296,26 @@
                 default:
                     break;
             }
+        }
+
+        /**
+         * Post Image as Base64 - custom Mobile Cart method
+         *
+         * @param base64
+         */
+        function uploadBase64(base64) {
+            $.ajax({
+                url: settings.postUrl,
+                method: 'POST',
+                dataType: 'json',
+                data: { base64: base64 }
+            }).done(function(response){
+                var success = 0;
+                if (typeof response.success != 'undefined'&& response.success == 1) {
+                    success = 1;
+                }
+                settings.onUploaded(success, response);
+            });
         }
 
         /**

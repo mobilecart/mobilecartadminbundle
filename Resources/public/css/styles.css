@@ -535,14 +535,6 @@ div.product-edit div.tab-content {
     margin-top: 15px;
 }
 
-select.adv-filter-op {
-    width: 152px;
-}
-
-.adv-filter-input {
-    width: 152px;
-}
-
 div#section-options select {
     min-height: 200px;
 }
@@ -562,10 +554,22 @@ div.listing-body {
 
 div.tab-panel {
     border-top-color: #fff;
+    border-right-color: #fff;
+    border-bottom-color: #fff;
+    border-left-color: #fff;
+    border-radius: 0;
+}
+
+div.adv-filters.tab-panel {
+    border-top-color: #ddd;
     border-right-color: #ddd;
     border-bottom-color: #ddd;
     border-left-color: #ddd;
-    border-radius: 0;
+    border-radius: 4px;
+}
+
+div.tab-pane div.panel {
+    margin-top: 15px;
 }
 
 table.table-bordered {

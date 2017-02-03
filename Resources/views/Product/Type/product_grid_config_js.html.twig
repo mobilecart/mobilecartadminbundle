@@ -107,6 +107,7 @@ App.ConfigProduct.collections.PaginatedCollection = Backbone.PageableCollection.
 
         var response = fullResponse.result;
         var search = fullResponse.search;
+        var columns = fullResponse.columns;
 
         // Set state
         this.state.totalRecords = parseInt(response.total);
@@ -117,7 +118,7 @@ App.ConfigProduct.collections.PaginatedCollection = Backbone.PageableCollection.
                 App.ConfigProduct.views.sorting === null ||
                 typeof(App.ConfigProduct.collections.sorting) === 'undefined') {
 
-            App.ConfigProduct.collections.sorting = new App.ConfigProduct.collections.SortableCollection(search.sortable);
+            App.ConfigProduct.collections.sorting = new App.ConfigProduct.collections.SortableCollection(columns);
 
             App.ConfigProduct.views.sorting = new App.ConfigProduct.views.TableHeading({
                 collection: App.ConfigProduct.collections.sorting,
@@ -126,7 +127,7 @@ App.ConfigProduct.collections.PaginatedCollection = Backbone.PageableCollection.
 
             App.ConfigProduct.views.sorting.render(); // view should be changing based on model changes
         } else {
-            App.ConfigProduct.collections.sorting.reset(search.sortable);
+            App.ConfigProduct.collections.sorting.reset(columns);
         }
 
         // handle adv. filters
@@ -517,7 +518,7 @@ App.ConfigProduct.views.TableHeading = Backbone.View.extend({
         html += '<th><input type="checkbox" value="1" name="product_check_all"></th>';
 
         this.collection.each(function(cell) {
-            if (self.columns.indexOf(cell.get('code')) >= 0) {
+            if (self.columns.indexOf(cell.get('key')) >= 0) {
 
                 var className = 'sorting';
                 if (cell.get('isActive') == 1) {
@@ -528,7 +529,7 @@ App.ConfigProduct.views.TableHeading = Backbone.View.extend({
                     }
                 }
 
-                html += '<th class="'+ className +'" data-sort="' + cell.get('code') + '">' + cell.get('label') + '</th>';
+                html += '<th class="'+ className +'" data-sort="' + cell.get('key') + '">' + cell.get('label') + '</th>';
             }
         });
 
@@ -601,7 +602,7 @@ $(function(){
 
     // for populating backbonejs properties
     var key = '{{ section_id }}';
-    App.ConfigProduct.Container = $('#'+key);
+    App.ConfigProduct.Container = $('#section-'+key);
 
     // product model collection
     App.ConfigProduct.collections.products = new App.ConfigProduct.collections.PaginatedCollection({

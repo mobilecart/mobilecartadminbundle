@@ -82,8 +82,9 @@
                                 <a href="#filterPanel" class="pull-left btn btn-default collapsed" data-parent="#accordion" data-toggle="collapse">Filters</a>
                             </div>
                             <div class="col-sm-6">
+
+                                {% if search.query|length > 0 %}
                                 <div class="input-group">
-                                    {% if search.query|length > 0 %}
                                     <span class="input-group-btn">
                                         <button class="btn btn-default search-clear" type="button">
                                             <i class="glyphicon glyphicon-remove"></i>
@@ -91,15 +92,15 @@
                                     </span>
                                     {% endif %}
                                     <input type="text" class="form-control search-query" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default search-submit" type="button">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </span>
+
+                                {% if search.query|length > 0 %}
                                 </div>
+                                {% endif %}
                             </div>
                             <div class="col-sm-3">
-                                <input class="btn btn-primary pull-right" type="submit" name="sbmt" value="Search" />
+                                <button class="btn btn-default search-submit pull-right" type="submit">
+                                    <i class="fa fa-search"> </i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -111,43 +112,58 @@
                     {% if search.advFilters is defined and search.advFilters|length > 0 %}
                         {% for advfilter in search.advFilters %}
                             {% set currentType = 'number' %}
-                            <div class="filter">
-                                <label>Filter</label>
-                                <select name="filter_field[{{ counter }}]" class="adv-filter-field">
-                                {% for obj in search.filterable %}
-                                    <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}{% if obj.code == advfilter.field %}{% set currentType = obj.type %} selected="selected"{% endif %}>{{ obj.label }}</option>
-                                {% endfor %}
-                                </select>
-                                <select name="filter_op[{{ counter }}]" class="adv-filter-op">
-                                {% for advfilterop in search.advfilterops %}
-                                    {% if currentType in advfilterop.types %}
-                                    <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'{% if advfilterop.code == advfilter.op %} selected="selected"{% endif %}>{{ advfilterop.label }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                                </select>
-                                <input type="text" class="adv-filter-input" name="filter_val[{{ counter }}]" value="{{ advfilter.value }}" />
-                                <a href="javascript:;" class="remove-filter glyphicon glyphicon-remove-circle" aria-hidden="true">&nbsp;</a>
+                            <div class="filter row">
+                                <div class="col-xs-4">
+                                    <select name="filter_field[{{ counter }}]" class="form-control adv-filter-field">
+                                    {% for obj in search.filterable %}
+                                        <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}{% if obj.code == advfilter.field %}{% set currentType = obj.type %} selected="selected"{% endif %}>{{ obj.label }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-4">
+                                    <select name="filter_op[{{ counter }}]" class="form-control adv-filter-op">
+                                    {% for advfilterop in search.advfilterops %}
+                                        {% if currentType in advfilterop.types %}
+                                        <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'{% if advfilterop.code == advfilter.op %} selected="selected"{% endif %}>{{ advfilterop.label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control adv-filter-input" name="filter_val[{{ counter }}]" value="{{ advfilter.value }}" />
+                                </div>
+                                <div class="col-xs-1">
+                                    <a href="javascript:;" class="remove-filter btn btn-default pull-right" aria-hidden="true"><i class="glyphicon glyphicon-remove"> </i></a>
+                                </div>
+
                             </div>
                             {% set counter = counter + 1 %}
                         {% endfor %}
                     {% endif %}
 
-                            <div class="filter">
-                                <label>Filter</label>
-                                <select name="filter_field[{{ counter }}]" class="adv-filter-field">
-                                {% for obj in search.filterable %}
-                                    <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}>{{ obj.label }}</option>
-                                {% endfor %}
-                                </select>
-                                <select name="filter_op[{{ counter }}]" class="adv-filter-op">
-                                {% for advfilterop in search.advfilterops %}
-                                    {% if 'number' in advfilterop.types %}
-                                    <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'>{{ advfilterop.label }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                                </select>
-                                <input type="text" class="adv-filter-input" name="filter_val[{{ counter }}]" value="" />
-                                <a href="javascript:;" class="add-filter glyphicon glyphicon-plus-sign" aria-hidden="true">&nbsp;</a>
+                            <div class="filter row">
+                                <div class="col-xs-4">
+                                    <select name="filter_field[{{ counter }}]" class="form-control adv-filter-field">
+                                    {% for obj in search.filterable %}
+                                        <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}>{{ obj.label }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-4">
+                                    <select name="filter_op[{{ counter }}]" class="form-control adv-filter-op">
+                                    {% for advfilterop in search.advfilterops %}
+                                        {% if 'number' in advfilterop.types %}
+                                        <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'>{{ advfilterop.label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control adv-filter-input" name="filter_val[{{ counter }}]" value="" />
+                                </div>
+                                <div class="col-xs-1">
+                                    <a href="javascript:;" class="add-filter btn btn-default pull-right" aria-hidden="true"><i class="glyphicon glyphicon-plus-sign"> </i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -232,7 +248,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                            {% if result.entities is defined %}
+                            {% if result.entities is defined and result.entities|length > 0 %}
                                 {% for entity in result.entities %}
                                     <tr>
                                         <td class="col-checkbox">
@@ -243,6 +259,11 @@
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}
+                            {% else %}
+                                {% set colspan = columns|length + 1 %}
+                                <tr>
+                                    <td colspan="{{ colspan }}" align="center">Table is Empty</td>
+                                </tr>
                             {% endif %}
                                 </tbody>
                             </table>
@@ -379,6 +400,14 @@
                 pagerForm.submit();
                 formatInput.val('html');
                 return false;
+            });
+
+            filtersContainer.delegate('div.filter a.remove-filter', 'click', function(e){
+                e.preventDefault();
+                var self = $(this);
+                self.parent().parent().remove();
+                pagerForm.submit();
+                return true;
             });
 
             // paginator previous

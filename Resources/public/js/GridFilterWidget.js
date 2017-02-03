@@ -34,25 +34,22 @@ GridFilterWidget.prototype = {
             widget.containerEl.append(widget.buildFilter());
             self.removeClass('add-filter');
             self.addClass('remove-filter');
-            self.removeClass('glyphicon-plus-sign');
-            self.addClass('glyphicon-remove-sign');
-        });
-
-        this.containerEl.delegate('div.filter a.remove-filter', 'click', function(e){
-            e.preventDefault();
-            var self = $(this);
-            self.parent().remove();
+            var icon = self.find('i.glyphicon');
+            icon.removeClass('glyphicon-plus-sign');
+            icon.addClass('glyphicon-remove');
         });
 
         this.containerEl.delegate('div.filter select.adv-filter-field', 'change', function(e){
             e.preventDefault();
             var self = $(this);
+            var parent = self.parent();
+            var row = parent.parent();
             var inputEl = {};
             var field = self.find(':selected');
             var type = field.attr('data-type');
 
             // change the available filter operations for the selected data-type
-            var filterOps = self.parent().find('select.adv-filter-op'); // todo : use sibling here
+            var filterOps = row.find('select.adv-filter-op');
             filterOps.html('');
             for(var x=0; x < widget.ops.length; x++) {
                 var op = widget.ops[x];
@@ -64,48 +61,47 @@ GridFilterWidget.prototype = {
             // change filter input type as necessary
             var choiceJson = field.attr('data-choices');
             if (!_.isUndefined(choiceJson)) {
+
+                var optionStr = '';
+                var choiceContainer = JSON.parse(choiceJson);
+                var choices = choiceContainer.choices;
+                var choice = '';
+                for (var x=0;x<choices.length;x++) {
+                    choice = choices[x];
+                    optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
+                }
+
                 // render select input, remove text input if necessary
-                inputEl = self.parent().find('select.adv-filter-input');
+                inputEl = row.find('select.adv-filter-input');
                 if (inputEl.length) {
 
                     inputEl.html('');
-                    var optionStr = '';
-                    var choiceContainer = JSON.parse(choiceJson);
-                    var choices = choiceContainer.choices;
-                    for (var x=0;x<choices.length;x++) {
-                        var choice = choices[x];
-                        optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                    }
-
                     inputEl.html(optionStr);
 
                 } else {
-                    inputEl = self.parent().find('input.adv-filter-input');
-                    if (_.isObject(inputEl)) {
 
-                        var optionStr = '';
-                        var choiceContainer = JSON.parse(choiceJson);
-                        var choices = choiceContainer.choices;
-                        for (var x=0;x<choices.length;x++) {
-                            var choice = choices[x];
-                            optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                        }
-
-                        var inputName = inputEl.attr('name');
-                        $('<select name="' + inputName + '" class="adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
-                        inputEl.remove();
+                    inputEl = row.find('input.adv-filter-input');
+                    for (var x=0;x<choices.length;x++) {
+                        choice = choices[x];
+                        optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
                     }
+
+                    var inputParent = inputEl.parent();
+                    inputEl.remove();
+                    inputParent.html('<select name="' + inputEl.attr('name') + '" class="form-control adv-filter-input">' + optionStr + '</select>');
                 }
 
             } else {
+
                 // render text input, remove select input if necessary
-                inputEl = self.parent().find('input.adv-filter-input');
+                inputEl = row.find('input.adv-filter-input');
                 if (!inputEl.length) {
-                    inputEl = self.parent().find('select.adv-filter-input');
+                    inputEl = row.find('select.adv-filter-input');
                     if (_.isObject(inputEl)) {
-                        var inputName = inputEl.attr('name');
-                        $('<input type="text" class="adv-filter-input" name="' + inputName + '" value="" />').insertAfter(inputEl);
+                        var inputParent = inputEl.parent();
                         inputEl.remove();
+                        inputParent.html('<input type="text" class="adv-filter-input" name="' + inputEl.attr('name') + '" value="" />');
+
                     }
                 }
             }
@@ -117,9 +113,9 @@ GridFilterWidget.prototype = {
     buildFilter: function() {
         var widget = this;
 
-        var html = '<div class="filter">';
-        html += '<label>Filter</label> ';
-        html += '<select name="filter_field[' + widget.counter + ']" class="adv-filter-field">';
+        var html = '<div class="filter row">';
+        html += '<div class="col-xs-4">';
+        html += '<select name="filter_field[' + widget.counter + ']" class="form-control adv-filter-field">';
         for (i in widget.fields) {
             var field = widget.fields[i];
             html += '<option value="' + field.code+'"';
@@ -130,67 +126,76 @@ GridFilterWidget.prototype = {
         }
 
         html += '</select> ';
-        html += '<select name="filter_op[' + widget.counter + ']" class="adv-filter-op">';
+        html += '</div>';
+        html += '<div class="col-xs-4">';
+        html += '<select name="filter_op[' + widget.counter + ']" class="form-control adv-filter-op">';
         for (var x=0; x < widget.ops.length; x++) {
             var op = widget.ops[x];
             html += '<option value="' + op.code + '"' + " data-types='{" + '"types":' + JSON.stringify(op.types) + "}'" + '>'+op.label+'</option>';
         }
 
         html += '</select> ';
-        html += '<input type="text" class="adv-filter-input" name="filter_val[' + widget.counter + ']" value="" /> ';
-        html += '<a href="javascript:;" class="add-filter glyphicon glyphicon-plus-sign" aria-hidden="true">&nbsp;</a>';
+        html += '</div>';
+        html += '<div class="col-xs-3">';
+        html += '<input type="text" class="adv-filter-input form-control" name="filter_val[' + widget.counter + ']" value="" /> ';
+        html += '</div>';
+        html += '<div class="col-xs-1">';
+        html += '<a href="javascript:;" class="add-filter btn btn-default pull-right" aria-hidden="true"><i class="glyphicon glyphicon-plus-sign"> </i></a>';
+        html += '</div>';
         html += '</div>';
         return html;
     },
     renderExisting: function() {
         var widget = this;
+        var inputEl = {};
 
         var fields = widget.containerEl.find('div.filter .adv-filter-field');
         for (var x=0; x<fields.length;x++) {
             var self = $(fields[x]);
+            var parent = self.parent();
+            var row = parent.parent();
+
             var field = self.find(':selected');
             var choiceJson = field.attr('data-choices');
 
             if (!_.isUndefined(choiceJson)) {
+
+                var optionStr = '';
+                var choiceContainer = JSON.parse(choiceJson);
+                var choices = choiceContainer.choices;
+                var choice = '';
+
                 // render select input, remove text input if necessary
-                var inputEl = self.parent().find('select.adv-filter-input');
+                inputEl = row.find('select.adv-filter-input');
                 if (inputEl.length) {
 
                     inputEl.html('');
-                    var optionStr = '';
-                    var choiceContainer = JSON.parse(choiceJson);
-                    var choices = choiceContainer.choices;
+
                     for (var x=0;x<choices.length;x++) {
-                        var choice = choices[x];
+                        choice = choices[x];
                         optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
                     }
 
                     inputEl.html(optionStr);
 
                 } else {
-                    var inputEl = self.parent().find('input.adv-filter-input');
-                    if (_.isObject(inputEl)) {
+                    inputEl = row.find('input.adv-filter-input');
 
-                        var value = inputEl.val();
-
-                        var optionStr = '';
-                        var choiceContainer = JSON.parse(choiceJson);
-                        var choices = choiceContainer.choices;
-                        for (var x=0;x<choices.length;x++) {
-                            var choice = choices[x];
-                            optionStr += '<option value="' + choice.value + '"';
-                            if (value == choice.value) {
-                                optionStr += ' selected="selected"';
-                            }
-                            optionStr += '>' + choice.label + '</option>';
+                    var value = inputEl.val();
+                    for (var x=0;x<choices.length;x++) {
+                        choice = choices[x];
+                        optionStr += '<option value="' + choice.value + '"';
+                        if (value == choice.value) {
+                            optionStr += ' selected="selected"';
                         }
-
-                        var inputName = inputEl.attr('name');
-                        $('<select name="' + inputName + '" class="adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
-                        inputEl.remove();
+                        optionStr += '>' + choice.label + '</option>';
                     }
-                }
 
+                    var inputName = inputEl.attr('name');
+                    var inputParent = inputEl.parent();
+                    inputEl.remove();
+                    inputParent.html('<select name="' + inputName + '" class="form-control adv-filter-input">' + optionStr + '</select>');
+                }
             }
         }
     }

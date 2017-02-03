@@ -2,7 +2,6 @@
     <td><input type="checkbox" class="select-product" id="product-<%- id %>" name="ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
     <td><%- id %></td>
     <td><%- name %></td>
-    <td><%- type %></td>
     <td><%- sku %></td>
     <td><%- price %></td>
     <td><%- qty %></td>
@@ -14,7 +13,7 @@
     <td><%- name %></td>
     <td><%- sku %></td>
     <td><%- price %></td>
-    <td><%- qty %></td>
+    <td><input type="number" class="item-qty" id="item-qty-<%- product_id %>" name="qtys[<%- product_id %>]" value="<%- qty %>" /></td>
 </script>
 
 <script type="text/template" id="product-grid-item">
@@ -29,50 +28,47 @@
 </script>
 
 <script type="text/html" id="product-pagination-template">
-    <% if (currentPage != 1) { %>
-    <button class="prev btn-default btn">Prev</button>
-    <% } %>
-
-    <label for="page">Page</label>
-    <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="number"> of <%= totalPages %>
-
-    <% if (lastPage != currentPage && lastPage != 0) { %>
-    <button class="btn btn-default next">Next</button>
-    <% } %>
+    <button type="button" class="prev btn-default btn <% if (currentPage == 1) { %> disabled <% } %>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></button>
+    <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="form-control number paginator">
+    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= lastPage) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
 </script>
 
 <script type="text/html" id="product-grid-adv-filter">
-    <div class="filter">
-        <label>Filter</label>
-        <select name="filter_field[<%= counter %>]" class="adv-filter-field">
-            <% _.each(fields, function(field) { %>
-            <option value="<%= field.code %>" data-type="<%= field.type %>"
-            <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
-            <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
-            <% }); %>
-        </select>
-
-        <select name="filter_op[<%= counter %>]" class="adv-filter-op">
-            <% _.each(ops, function(op) { %>
-            <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
-            <% }); %>
-        </select>
-
-        <% if (choices.length > 0) { %>
-        <select name="filter_val[<%= counter %>]" class="adv-filter-input">
-            <% _.each(choices, function(option) { %>
-            <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
-            <% }); %>
-        </select>
-        <% } else { %>
-        <input name="filter_val[<%= counter %>]" type="text" class="adv-filter-input" value="<%= value %>" />
-        <% } %>
-
-        <% if (remove) { %>
-        <a href="javascript:;" class="remove-filter"><i class="fa fa-times fa-lg"></i></a>
-        <% } else { %>
-        <a href="javascript:;" class="add-filter"><i class="fa fa-plus fa-fw fa-lg"></i></a>
-        <% } %>
+    <div class="filter row">
+        <div class="col-xs-4">
+            <select name="filter_field[<%= counter %>]" class="form-control adv-filter-field">
+                <% _.each(fields, function(field) { %>
+                <option value="<%= field.code %>" data-type="<%= field.type %>"
+                <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
+                <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-4">
+            <select name="filter_op[<%= counter %>]" class="form-control adv-filter-op">
+                <% _.each(ops, function(op) { %>
+                <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-3">
+            <% if (choices.length > 0) { %>
+            <select name="filter_val[<%= counter %>]" class="form-control adv-filter-input">
+                <% _.each(choices, function(option) { %>
+                <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
+                <% }); %>
+            </select>
+            <% } else { %>
+            <input name="filter_val[<%= counter %>]" type="text" class="form-control adv-filter-input" value="<%= value %>" />
+            <% } %>
+        </div>
+        <div class="col-xs-1">
+            <% if (remove) { %>
+            <a href="javascript:;" class="remove-filter btn btn-default pull-right"><i class="glyphicon glyphicon-remove"> </i></a>
+            <% } else { %>
+            <a href="javascript:;" class="add-filter btn btn-default pull-right"><i class="glyphicon glyphicon-plus-sign"> </i></a>
+            <% } %>
+        </div>
     </div>
 </script>
 
@@ -127,12 +123,14 @@ App.Product.collections.PaginatedCollection = Backbone.PageableCollection.extend
         },
         currentPage: 'page',
         format: 'json',
-        type: 1
+        type: 1,
+        q: ''
     },
     parse: function(fullResponse) {
 
         var response = fullResponse.result;
         var search = fullResponse.search;
+        var columns = fullResponse.columns;
 
         // Set state
         this.state.totalRecords = parseInt(response.total);
@@ -143,7 +141,7 @@ App.Product.collections.PaginatedCollection = Backbone.PageableCollection.extend
                 App.Product.views.sorting === null ||
                 typeof(App.Product.collections.sorting) === 'undefined') {
 
-            App.Product.collections.sorting = new App.Product.collections.SortableCollection(search.sortable);
+            App.Product.collections.sorting = new App.Product.collections.SortableCollection(columns);
 
             App.Product.views.sorting = new App.Product.views.TableHeading({
                 collection: App.Product.collections.sorting,
@@ -152,7 +150,7 @@ App.Product.collections.PaginatedCollection = Backbone.PageableCollection.extend
 
             App.Product.views.sorting.render(); // view should be changing based on model changes
         } else {
-            App.Product.collections.sorting.reset(search.sortable);
+            App.Product.collections.sorting.reset(columns);
         }
 
         // handle adv. filters
@@ -193,11 +191,14 @@ App.Product.views.ProductList = Backbone.View.extend({
     selected: [],
     initialize: function() {
         var products = this.collection;
-        products.on('add', this.addOne, this);
-        this.render();
+        products.on('sync', this.render, this);
     },
     render: function() {
+        var self = this;
         this.$el.html('');
+        this.collection.each(function(product) {
+            self.addOne(product);
+        });
         return this;
     },
     addOne: function(product) {
@@ -230,7 +231,10 @@ App.Product.views.ProductView = Backbone.View.extend({
         var product = this.model.toJSON();
         var productId = product.id;
 
-        if (self.selected.indexOf(productId) > -1) {
+        var selectedInputName = 'product_ids[' + productId + ']';
+        var selectedInput = App.Product.Container.find('input[name="' + selectedInputName + '"]');
+
+        if (selectedInput.length > 0) {
             product.checked = 1;
         } else {
             product.checked = 0;
@@ -242,12 +246,11 @@ App.Product.views.ProductView = Backbone.View.extend({
     productClick: function(e) {
         var product = this.model;
         var self = this;
-
+        var productId = product.get('id');
         var link = $(e.currentTarget);
-        var idStr = link.attr('id');
-        var idParts = idStr.split('-');
-        var id = idParts[1];
-        var checkbox = $('input#product-id-' + id);
+
+        var selectedInputName = 'product_ids[' + productId + ']';
+        var selectedInput = App.Product.Container.find('input[name="' + selectedInputName + '"]');
 
         var item = product.toJSON();
         item.product_id = item.id;
@@ -258,7 +261,7 @@ App.Product.views.ProductView = Backbone.View.extend({
 
         // update totals
 
-        if (checkbox.length > 0) {
+        if (selectedInput.length > 0) {
 
             // send update via ajax
             var url = App.serverURL + 'admin/order/remove/item';
@@ -315,9 +318,15 @@ App.Product.views.SelectedProductList = Backbone.View.extend({
     render: function() {
         var self = this;
         this.$el.html('');
-        this.collection.each(function(item) {
-            self.addOne(item);
-        });
+
+        if (this.collection.length > 0) {
+            this.collection.each(function(item) {
+                self.addOne(item);
+            });
+        } else {
+            this.$el.append('<tr><td colspan="6" align="center">No Products Selected</td></tr>');
+        }
+
         return this;
     },
     addOne: function(item) {
@@ -336,7 +345,8 @@ App.Product.views.SelectedProductView = Backbone.View.extend({
     className: 'item-grid',
     selected: [],
     events: {
-        'click input.select-item': 'itemClick'
+        'click input.select-item': 'itemClick',
+        'change input.item-qty': 'changeQty'
     },
     template: _.template($('#item-grid-single').html()),
     initialize: function() {
@@ -383,6 +393,31 @@ App.Product.views.SelectedProductView = Backbone.View.extend({
             renderTabs(data.cart);
         });
 
+    },
+    changeQty: function(e) {
+        var self = this;
+        var item = this.model.toJSON();
+        var qtyEl = $(e.currentTarget);
+        item.qty = qtyEl.val();
+
+        var cartStr = JSON.stringify(cart);
+        var itemStr = JSON.stringify(item);
+
+        // send update via ajax
+        var url = App.serverURL + 'admin/order/add/item';
+        $.ajax({
+            url: url,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                cart: cartStr,
+                item: itemStr
+            }
+        }).done(function(data) {
+
+            // update cart
+            renderTabs(data.cart);
+        });
     }
 });
 
@@ -424,9 +459,10 @@ App.Product.views.GridFilterView = Backbone.View.extend({
     changeFilter: function(e) {
         var self = this;
         var select = $(e.currentTarget);
+        var row = select.parent().parent();
         var field = select.find(':selected');
         var type = field.attr('data-type');
-        var filterOps = select.parent().find('select.adv-filter-op');
+        var filterOps = row.find('select.adv-filter-op');
         filterOps.html('');
         for(var x=0; x < self.ops.length; x++) {
             var op = self.ops[x];
@@ -439,46 +475,37 @@ App.Product.views.GridFilterView = Backbone.View.extend({
         var choiceJson = field.attr('data-choices');
         if (!_.isUndefined(choiceJson)) {
             // render select input, remove text input if necessary
-            var inputEl = select.parent().find('select.adv-filter-input');
+            var inputEl = row.find('select.adv-filter-input');
+
+            var optionStr = '';
+            var choiceContainer = JSON.parse(choiceJson);
+            var choices = choiceContainer.choices;
+            for (var x=0;x<choices.length;x++) {
+                var choice = choices[x];
+                optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
+            }
+
             if (inputEl.length) {
 
                 inputEl.html('');
-                var optionStr = '';
-                var choiceContainer = JSON.parse(choiceJson);
-                var choices = choiceContainer.choices;
-                for (var x=0;x<choices.length;x++) {
-                    var choice = choices[x];
-                    optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                }
-
                 inputEl.html(optionStr);
 
             } else {
-                inputEl = select.parent().find('input.adv-filter-input');
+                inputEl = row.find('input.adv-filter-input');
                 if (_.isObject(inputEl)) {
-
-                    var optionStr = '';
-                    var choiceContainer = JSON.parse(choiceJson);
-                    var choices = choiceContainer.choices;
-                    for (var x=0;x<choices.length;x++) {
-                        var choice = choices[x];
-                        optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                    }
-
-                    var inputName = inputEl.attr('name');
-                    $('<select name="' + inputName + '" class="adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
+                    $('<select name="' + inputEl.attr('name') + '" class="form-control adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
                     inputEl.remove();
                 }
             }
 
         } else {
             // render text input, remove select input if necessary
-            var inputEl = select.parent().find('input.adv-filter-input');
+            var inputEl = row.find('input.adv-filter-input');
             if (!inputEl.length) {
-                inputEl = select.parent().find('select.adv-filter-input');
+                inputEl = row.find('select.adv-filter-input');
                 if (_.isObject(inputEl)) {
                     var inputName = inputEl.attr('name');
-                    $('<input type="text" class="adv-filter-input" name="' + inputName + '" value="" />').insertAfter(inputEl);
+                    $('<input type="text" class="form-control adv-filter-input" name="' + inputName + '" value="" />').insertAfter(inputEl);
                     inputEl.remove();
                 }
             }
@@ -578,7 +605,7 @@ App.Product.views.GridFilterView = Backbone.View.extend({
         var link = $(e.currentTarget);
         link.removeClass('add-filter');
         link.addClass('remove-filter');
-        link.html('<i class="fa fa-times fa-lg"></i>');
+        link.html('<i class="glyphicon glyphicon-remove"> </i>');
         var choices = [];
 
         var ops = [];
@@ -604,8 +631,9 @@ App.Product.views.GridFilterView = Backbone.View.extend({
     removeFilter: function(e) {
         e.preventDefault();
         var link = $(e.currentTarget);
-        link.parent().remove();
-        return this;
+        link.parent().parent().remove();
+        App.Product.Container.find('div.adv-filters-buttons button.adv-filters-search').trigger('click');
+        return false;
     }
 });
 
@@ -621,6 +649,8 @@ App.Product.views.TableButtons = Backbone.View.extend({
     },
     updateSearch: function (e) {
         e.preventDefault();
+
+        var queryText = App.Product.Container.find('input.search-query').val();
 
         // filter fields
         App.Product.collections.products.queryParams.filter_field = [];
@@ -644,6 +674,7 @@ App.Product.views.TableButtons = Backbone.View.extend({
         });
 
         App.Product.collections.products.currentPage = 1;
+        App.Product.collections.products.queryParams.q = queryText;
         App.Product.collections.products.fetch();
 
         return false;
@@ -653,7 +684,7 @@ App.Product.views.TableButtons = Backbone.View.extend({
 App.Product.views.TableHeading = Backbone.View.extend({
     el : 'table thead.grid-header',
     tagName: 'tr',
-    columns: ['id','type','name','sku','price','qty'],
+    columns: ['id','name','sku','price','qty'],
     events: {
         'click th': 'gotoPage',
         'click button.adv-filters-search': 'updateSearch'
@@ -668,10 +699,10 @@ App.Product.views.TableHeading = Backbone.View.extend({
         this.$el.html('');
 
         var html = '';
-        html += '<th><input type="checkbox" value="1" name="product_check_all"></th>';
+        html += '<th>&nbsp;</th>';
 
         this.collection.each(function(cell) {
-            if (self.columns.indexOf(cell.get('code')) >= 0) {
+            if (self.columns.indexOf(cell.get('key')) >= 0) {
 
                 var className = 'sorting';
                 if (cell.get('isActive') == 1) {
@@ -682,7 +713,7 @@ App.Product.views.TableHeading = Backbone.View.extend({
                     }
                 }
 
-                html += '<th class="'+ className +'" data-sort="' + cell.get('code') + '">' + cell.get('label') + '</th>';
+                html += '<th class="'+ className +'" data-sort="' + cell.get('key') + '">' + cell.get('label') + '</th>';
             }
         });
 
@@ -754,8 +785,8 @@ App.Product.views.PaginatedView = Backbone.View.extend({
     $(function(){
 
         // for populating backbonejs properties
-        var key = '{{ section_id }}';
-        App.Product.Container = $('#'+key);
+        var key = 'section-{{ section_id }}';
+        App.Product.Container = $('#' + key);
 
         // product model collection
         App.Product.collections.products = new App.Product.collections.PaginatedCollection({
@@ -782,6 +813,17 @@ App.Product.views.PaginatedView = Backbone.View.extend({
 
         // fetch product collection and trigger views
         App.Product.collections.products.fetch();
+
+        var textInput = App.Product.Container.find('input.search-query');
+        textInput.keypress(function(e){
+            // todo : auto search
+            if (e.which == 13) {
+                App.Product.Container.find('div.adv-filters-buttons button.adv-filters-search').trigger('click');
+                return false;
+            }
+
+            return true;
+        });
 
     });
 </script>

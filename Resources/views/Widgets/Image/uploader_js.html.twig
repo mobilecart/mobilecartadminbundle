@@ -20,7 +20,7 @@
         var settings = self.html5Uploader({
 
             parent: parentEl,
-            postUrl: '{{ path('cart_admin_image_upload') }}' + '{{ upload_query|raw }}', // add parameters here
+            postUrl: '{{ path('cart_admin_image_upload_base64') }}' + '{{ upload_query|raw }}', // add parameters here
             imageUrl: '{{ path('cart_admin_image') }}',
 
             /**

@@ -1,7 +1,7 @@
 
 <ul class="nav nav-tabs">
     <li class="active">
-        <a href="#section-image-list" data-toggle="tab" aria-expanded="true">List</a>
+        <a href="#section-image-list" data-toggle="tab" aria-expanded="true">Selected Images</a>
     </li>
     <li class="">
         <a href="#section-image-upload" data-toggle="tab" aria-expanded="false">Upload</a>
@@ -13,23 +13,23 @@
             <table class="table table-bordered table-striped table-hover dataTable">
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
                         <th>Size</th>
                         <th>Code</th>
                         <th>Sort</th>
                         <th>Default</th>
                         <th>Alt. Text</th>
+                        <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for image in images %}
                     <tr data-id="{{ image.getId() }}">
-                        <td><a href="#" class="image-remove-btn"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
-                        <td>{{ image.getWidth() }} x {{ image.getHeight() }}</td>
+                        <td>{% if image.getWidth() > 0 %}{{ image.getWidth() }} x {{ image.getHeight() }}{% endif %}</td>
                         <td>{{ image.getCode() }}</td>
-                        <td><input type="number" class="image-sort-order" value="{{ image.getSortOrder() }}" /></td>
+                        <td><input type="number" class="form-control image-sort-order" value="{% if image.getSortOrder() > 0 %}{{ image.getSortOrder() }}{% else %}1{% endif %}" /></td>
                         <td><input type="checkbox" class="image-is-default" value="1"{% if image.getIsDefault() == 1 %} checked="checked"{% endif %} /></td>
-                        <td><textarea class="image-alt-text">{{ image.getAltText() }}</textarea></td>
+                        <td><textarea class="form-control image-alt-text">{{ image.getAltText() }}</textarea></td>
+                        <td><a href="#" class="btn btn-default image-remove-btn"><i class="glyphicon glyphicon-remove"> </i></a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -40,18 +40,27 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                Choose Image and Select File
+                Choose Image Size and Select File
             </div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-12">
+                        {% set x = 0 %}
                         {% for code, size in image_sizes %}
                         <div class="radio">
                             <label class="radio">
-                                <input type="radio" name="targetsize" data-code="{{ code }}" data-width="{{ size.width }}" data-height="{{ size.height }}" value="{{ size.width }},{{ size.height }}" />
+                                <input type="radio"
+                                       name="targetsize"
+                                       data-code="{{ code }}"
+                                       data-width="{{ size.width }}"
+                                       data-height="{{ size.height }}"
+                                       value="{{ size.width }},{{ size.height }}"
+                                       {% if x == 0 %}checked="checked"{% endif %}
+                                        />
                                 {{ size.width }} x {{ size.height }} : {{ code }}
                             </label>
                         </div>
+                            {% set x = x + 1 %}
                         {% endfor %}
                     </div>
                 </div>

@@ -1,54 +1,52 @@
 <ul class="nav nav-tabs">
     <li class="active">
-        <a href="#section-products" data-toggle="tab" aria-expanded="false">Products</a>
+        <a href="#section-products-selected" data-toggle="tab" aria-expanded="false">Selected Products</a>
     </li>
     <li class="">
-        <a href="#section-search" data-toggle="tab" aria-expanded="true">Add Product</a>
+        <a href="#section-products-search" data-toggle="tab" aria-expanded="true">Search</a>
     </li>
 </ul>
 <div class="tab-content">
-    <div id="section-products" class="tab-pane tab-panel fade  active in">
-
-        <div class="panel panel-default tab-panel">
-
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover dataTable">
-                        <thead class="">
-                        <tr>
-                            <th>&nbsp;</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Sku</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                        </tr>
-                        </thead>
-                        <tbody class="selected-product-list">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div id="section-products-selected" class="tab-pane tab-panel fade  active in">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover dataTable">
+                <thead class="selected-grid-header">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Sku</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                    </tr>
+                </thead>
+                <tbody class="selected-product-list">
+                    <tr>
+                        <td colspan="6" align="center">No Products Selected</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
     </div>
-    <div id="section-search" class="tab-pane tab-panel fade">
+    <div id="section-products-search" class="tab-pane tab-panel fade">
 
         <div class="panel panel-default adv-filters">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
                     </div>
                     <div class="col-sm-6">
+                        <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
+                    </div>
+                    <div class="col-sm-3">
                         <div class="pull-right adv-filters-buttons">
-                            <button class="btn btn-primary adv-filters-search">Search</button>
+                            <button class="btn btn-default adv-filters-search"><i class="fa fa-search"> </i></button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="panel-body panel-collapse in" id="{{ section_id }}-filters-panel">
+            <div class="panel-body panel-collapse collapse" id="{{ section_id }}-filters-panel">
                 <div id="{{ section_id }}-filters-container" class="filters-container">
 
                 </div>
@@ -57,28 +55,19 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-
                 <div class="row">
-                    <div class="col-md-5 grid-pager pull-left">
+                    <div class="col-sm-2">
 
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-sm-4">
 
-                        <div class="pull-left">
-                            <label>Show</label>
-                            <select name="per_page">
-                                <option value="15">15</option>
-                                <option selected="selected" value="30">30</option>
-                                <option value="45">45</option>
-                                <option value="60">60</option>
-                            </select>
+                    </div>
+                    <div class="col-sm-6" role="group">
+                        <div class="grid-pager btn-group input-group pull-right paginator">
+
                         </div>
                     </div>
-                    <div class="col-md-4">
-
-                    </div>
                 </div>
-
             </div>
             <div class="panel-body listing-body">
                 <div class="table-responsive">

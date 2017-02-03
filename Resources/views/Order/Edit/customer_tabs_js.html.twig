@@ -1,60 +1,55 @@
 <script type="text/template" id="customer-grid-single">
-    <td><input type="radio" name="select_customer_id" class="select-customer" id="customer-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td align="center">
+        <input type="radio" name="select_customer_id" class="select-customer" id="customer-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> />
+    </td>
     <td><%- id %></td>
-    <td><%- name %></td>
-</script>
-
-<script type="text/template" id="selected-customer-grid-single">
-    <td><input type="checkbox" name="customer_id" class="selected-customer" id="selected-customer-id-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> /></td>
-    <td><%- id %></td>
-    <td><%- name %></td>
+    <td><%- first_name %></td>
+    <td><%- last_name %></td>
+    <td><%- email %></td>
 </script>
 
 <script type="text/html" id="customer-pagination-template">
-    <% if (currentPage != 1) { %>
-    <button class="prev btn-default btn">Prev</button>
-    <% } %>
-
-    <label for="page">Page</label>
-    <input type="number" value="<%= currentPage %>" name="page" id="customer-page" class="number"> of <%= totalPages %>
-
-    <% if (lastPage != currentPage && lastPage != 0) { %>
-    <button class="btn btn-default next">Next</button>
-    <% } %>
+    <button type="button" class="prev btn-default btn <% if (currentPage == 1) { %> disabled <% } %>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></button>
+    <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="form-control number paginator">
+    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= lastPage) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
 </script>
 
 <script type="text/html" id="customer-grid-adv-filter">
-    <div class="filter">
-        <label>Filter</label>
-        <select name="filter_field[<%= counter %>]" class="adv-filter-field">
-            <% _.each(fields, function(field) { %>
-            <option value="<%= field.code %>" data-type="<%= field.type %>"
-            <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
-            <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
-            <% }); %>
-        </select>
-
-        <select name="filter_op[<%= counter %>]" class="adv-filter-op">
-            <% _.each(ops, function(op) { %>
-            <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
-            <% }); %>
-        </select>
-
-        <% if (choices.length > 0) { %>
-        <select name="filter_val[<%= counter %>]" class="adv-filter-input">
-            <% _.each(choices, function(option) { %>
-            <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
-            <% }); %>
-        </select>
-        <% } else { %>
-        <input name="filter_val[<%= counter %>]" type="text" class="adv-filter-input" value="<%= value %>" />
-        <% } %>
-
-        <% if (remove) { %>
-        <a href="javascript:;" class="remove-filter"><i class="fa fa-times fa-lg"></i></a>
-        <% } else { %>
-        <a href="javascript:;" class="add-filter"><i class="fa fa-plus fa-fw fa-lg"></i></a>
-        <% } %>
+    <div class="filter row">
+        <div class="col-xs-4">
+            <select name="filter_field[<%= counter %>]" class="form-control adv-filter-field">
+                <% _.each(fields, function(field) { %>
+                <option value="<%= field.code %>" data-type="<%= field.type %>"
+                <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
+                <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-4">
+            <select name="filter_op[<%= counter %>]" class="form-control adv-filter-op">
+                <% _.each(ops, function(op) { %>
+                <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-3">
+            <% if (choices.length > 0) { %>
+            <select name="filter_val[<%= counter %>]" class="form-control adv-filter-input">
+                <% _.each(choices, function(option) { %>
+                <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
+                <% }); %>
+            </select>
+            <% } else { %>
+            <input name="filter_val[<%= counter %>]" type="text" class="form-control adv-filter-input" value="<%= value %>" />
+            <% } %>
+        </div>
+        <div class="col-xs-1">
+            <% if (remove) { %>
+            <a href="javascript:;" class="remove-filter"><i class="glyphicon glyphicon-remove"> </i></a>
+            <% } else { %>
+            <a href="javascript:;" class="add-filter"><i class="glyphicon glyphicon-plus-sign"></i></a>
+            <% } %>
+        </div>
     </div>
 </script>
 
@@ -108,12 +103,14 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
             "1": 'desc'
         },
         currentPage: 'page',
-        format: 'json'
+        format: 'json',
+        q: ''
     },
     parse: function(fullResponse) {
 
         var response = fullResponse.result;
         var search = fullResponse.search;
+        var columns = fullResponse.columns;
 
         // Set state
         this.state.totalRecords = parseInt(response.total);
@@ -124,7 +121,7 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
                 App.Customer.views.sorting === null ||
                 typeof(App.Customer.collections.sorting) === 'undefined') {
 
-            App.Customer.collections.sorting = new App.Customer.collections.SortableCollection(search.sortable);
+            App.Customer.collections.sorting = new App.Customer.collections.SortableCollection(columns);
 
             App.Customer.views.sorting = new App.Customer.views.TableHeading({
                 collection: App.Customer.collections.sorting,
@@ -133,7 +130,7 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
             App.Customer.views.sorting.render(); // view should be changing based on model changes
         } else {
-            App.Customer.collections.sorting.reset(search.sortable);
+            App.Customer.collections.sorting.reset(columns);
         }
 
         // handle adv. filters
@@ -170,40 +167,65 @@ App.Customer.views.CustomerList = Backbone.View.extend({
     selected: [],
     initialize: function() {
         var customers = this.collection;
-        customers.on('add', this.addOne, this);
-        this.render();
+        customers.on('sync', this.render, this);
     },
     render: function() {
+        var self = this;
         this.$el.html('');
+        this.collection.each(function(model) {
+            self.addOne(model);
+        });
         return this;
     },
     addOne: function(customer) {
         var view = new App.Customer.views.CustomerView({ model: customer });
         view.selected = this.selected;
-        this.$el.append(view.render().el);
+        var html = view.render().el;
+        this.$el.append(html);
         return this;
     }
 });
 
 App.Customer.views.updateForm = function(customer) {
-    if (typeof customer.name != 'undefined') {
-        var customerDiv = $('div#section-customer');
-        var customerInputs = customerDiv.find('input');
-        for (var key in customer) {
-            for (var x=0; x < customerInputs.length; x++) {
-                var input = $(customerInputs[x]);
-                var inputId = input.attr('id');
-                if (inputId.indexOf(key) > 0) {
-                    var value = customer[key];
-                    if (key == 'is_shipping_same') {
-                        if (value == 1) {
-                            input.trigger('click');
-                        }
-                    } else {
-                        input.val(value);
-                    }
+    if (typeof customer.id != 'undefined' && customer.id > 0) {
 
+        var customerDiv = $('div#section-customer-form');
+        var customerInputs = customerDiv.find('input, select');
+        var key = '';
+        var value = '';
+        var input = {};
+
+        for (key in customer) {
+
+            switch(key) {
+                case 'id':
+                    key = 'customer_id';
+                    input = $('#' + key);
+                    value = customer[key];
                     break;
+                case 'first_name':
+                    value = customer[key] + ' ' + customer['last_name'];
+                    input = $('#order_billing_name');
+                    break;
+                default:
+                    //no-op
+                    input = $('#order_' + key);
+                    value = customer[key];
+                    break;
+            }
+
+            if (input.length == 0) {
+                continue;
+            }
+
+            var inputId = input.attr('id');
+            if (inputId.indexOf(key) > 0) {
+                if (key == 'is_shipping_same') {
+                    if (value == 1) {
+                        input.trigger('click');
+                    }
+                } else {
+                    input.val(value);
                 }
             }
         }
@@ -228,7 +250,10 @@ App.Customer.views.CustomerView = Backbone.View.extend({
         var customer = this.model.toJSON();
         var customerId = customer.id;
 
-        if (typeof self.selected != 'undefined' && typeof self.selected == 'object' && self.selected.indexOf(customerId) > -1) {
+        if (typeof self.selected != 'undefined'
+            && typeof self.selected == 'object'
+            && self.selected.indexOf(customerId) > -1
+        ) {
             customer.checked = 1;
         } else {
             customer.checked = 0;
@@ -242,22 +267,17 @@ App.Customer.views.CustomerView = Backbone.View.extend({
         return this;
     },
     customerClick: function(e) {
-        var customer = this.model;
         var self = this;
-
+        var customer = this.model;
+        var customerId = customer.get('id');
         var link = $(e.currentTarget);
-        var idStr = link.attr('id');
-        var idParts = idStr.split('-');
-        var id = idParts[1];
-        var checkbox = $('input#selected-customer-id-' + id);
+        var checkbox = $('input#selected-customer-id-' + customerId);
 
         var cartStr = JSON.stringify(cart);
         var customerStr = JSON.stringify(customer.toJSON());
 
         // send update via ajax
         var url = App.serverURL + 'admin/order/update/customer';
-
-        // todo : customer_id or object
 
         $.ajax({
             url: url,
@@ -268,79 +288,6 @@ App.Customer.views.CustomerView = Backbone.View.extend({
                 customer: customerStr
             }
         }).done(function(data) {
-            // update cart
-            renderTabs(data.cart);
-        });
-    }
-});
-
-/**
- * Customer Listing for selected Customers
- *
- * pass in the collection
- *  render rows
- *
- */
-App.Customer.views.SelectedCustomerList = Backbone.View.extend({
-    el : '.selected-customer-list',
-    selected: [],
-    initialize: function() {
-        var shipments = this.collection;
-        shipments.on('all', this.render, this);
-    },
-    render: function() {
-        var self = this;
-        this.$el.html('');
-        this.collection.each(function(customer) {
-            self.addOne(customer);
-        });
-        return this;
-    },
-    addOne: function(customer) {
-        var view = new App.Customer.views.SelectedCustomerView({ model: customer });
-        this.$el.append(view.render().el);
-        return this;
-    }
-});
-
-App.Customer.views.SelectedCustomerView = Backbone.View.extend({
-    tagName: 'tr',
-    className: 'selected-item-grid',
-    selected: [],
-    events: {
-        'click input.selected-customer': 'customerClick'
-    },
-    template: _.template($('#selected-customer-grid-single').html()),
-    initialize: function() {
-        this.model.bind('change', this.render, this);
-        this.model.bind('remove', this.remove, this);
-    },
-    render: function() {
-        var self = this;
-
-        var customer = this.model.toJSON();
-        var customerId = customer.id;
-        customer.checked = 1;
-
-        this.$el.html(this.template(customer));
-        return this;
-    },
-    customerClick: function(e) {
-        var customer = this.model;
-        var cartStr = JSON.stringify(cart);
-
-        // send update via ajax
-        var url = App.serverURL + 'admin/order/remove/customer';
-        $.ajax({
-            url: url,
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                cart: cartStr,
-                customer_id: customer.get('id')
-            }
-        }).done(function(data) {
-
             // update cart
             renderTabs(data.cart);
         });
@@ -385,9 +332,11 @@ App.Customer.views.GridFilterView = Backbone.View.extend({
     changeFilter: function(e) {
         var self = this;
         var select = $(e.currentTarget);
+        var row = select.parent().parent();
+
         var field = select.find(':selected');
         var type = field.attr('data-type');
-        var filterOps = select.parent().find('select.adv-filter-op');
+        var filterOps = row.find('select.adv-filter-op');
         filterOps.html('');
         for(var x=0; x < self.ops.length; x++) {
             var op = self.ops[x];
@@ -398,45 +347,34 @@ App.Customer.views.GridFilterView = Backbone.View.extend({
 
         // change filter input type as necessary
         var choiceJson = field.attr('data-choices');
+        var optionStr = '';
+        var choiceContainer = JSON.parse(choiceJson);
+        var choices = choiceContainer.choices;
+        for (var x = 0; x < choices.length; x++) {
+            var choice = choices[x];
+            optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
+        }
+
         if (!_.isUndefined(choiceJson)) {
             // render select input, remove text input if necessary
-            var inputEl = select.parent().find('select.adv-filter-input');
+            var inputEl = row.find('select.adv-filter-input');
             if (inputEl.length) {
-
-                inputEl.html('');
-                var optionStr = '';
-                var choiceContainer = JSON.parse(choiceJson);
-                var choices = choiceContainer.choices;
-                for (var x=0;x<choices.length;x++) {
-                    var choice = choices[x];
-                    optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                }
-
                 inputEl.html(optionStr);
-
             } else {
-                inputEl = select.parent().find('input.adv-filter-input');
+                inputEl = row.find('input.adv-filter-input');
                 if (_.isObject(inputEl)) {
 
-                    var optionStr = '';
-                    var choiceContainer = JSON.parse(choiceJson);
-                    var choices = choiceContainer.choices;
-                    for (var x=0;x<choices.length;x++) {
-                        var choice = choices[x];
-                        optionStr += '<option value="' + choice.value + '">' + choice.label + '</option>';
-                    }
-
                     var inputName = inputEl.attr('name');
-                    $('<select name="' + inputName + '" class="adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
+                    $('<select name="' + inputName + '" class="form-control adv-filter-input">' + optionStr + '</select>').insertAfter(inputEl);
                     inputEl.remove();
                 }
             }
 
         } else {
             // render text input, remove select input if necessary
-            var inputEl = select.parent().find('input.adv-filter-input');
+            var inputEl = row.find('input.adv-filter-input');
             if (!inputEl.length) {
-                inputEl = select.parent().find('select.adv-filter-input');
+                inputEl = row.find('select.adv-filter-input');
                 if (_.isObject(inputEl)) {
                     var inputName = inputEl.attr('name');
                     $('<input type="text" class="adv-filter-input" name="' + inputName + '" value="" />').insertAfter(inputEl);
@@ -459,7 +397,8 @@ App.Customer.views.GridFilterView = Backbone.View.extend({
 
         // if it's a model object
         if (!_.isUndefined(filter.attributes)) {
-            for(var x=0; x < this.filterable.length; x++) {
+
+            for(var x = 0; x < this.filterable.length; x++) {
                 var field = this.filterable[x];
                 if (field.code == filter.get('field')) {
                     type = field.type;
@@ -539,7 +478,7 @@ App.Customer.views.GridFilterView = Backbone.View.extend({
         var link = $(e.currentTarget);
         link.removeClass('add-filter');
         link.addClass('remove-filter');
-        link.html('<i class="fa fa-times fa-lg"></i>');
+        link.html('<i class="glyphicon glyphicon-remove"></i>');
         var choices = [];
 
         var ops = [];
@@ -565,7 +504,7 @@ App.Customer.views.GridFilterView = Backbone.View.extend({
     removeFilter: function(e) {
         e.preventDefault();
         var link = $(e.currentTarget);
-        link.parent().remove();
+        link.parent().parent().remove();
         return this;
     }
 });
@@ -582,6 +521,8 @@ App.Customer.views.TableButtons = Backbone.View.extend({
     },
     updateSearch: function (e) {
         e.preventDefault();
+
+        var queryText = App.Customer.Container.find('input.search-query').val();
 
         // filter fields
         App.Customer.collections.customers.queryParams.filter_field = [];
@@ -604,6 +545,7 @@ App.Customer.views.TableButtons = Backbone.View.extend({
             App.Customer.collections.customers.queryParams.filter_val.push(self.val());
         });
 
+        App.Customer.collections.customers.queryParams.q = queryText;
         App.Customer.collections.customers.currentPage = 1;
         App.Customer.collections.customers.fetch();
 
@@ -614,7 +556,7 @@ App.Customer.views.TableButtons = Backbone.View.extend({
 App.Customer.views.TableHeading = Backbone.View.extend({
     el : 'table thead.grid-header',
     tagName: 'tr',
-    columns: ['id','name'],
+    columns: ['id','first_name','last_name','email'],
     events: {
         'click th': 'gotoPage',
         'click button.adv-filters-search': 'updateSearch'
@@ -633,7 +575,7 @@ App.Customer.views.TableHeading = Backbone.View.extend({
         html += '<th>&nbsp;</th>';
 
         this.collection.each(function(cell) {
-            if (self.columns.indexOf(cell.get('code')) >= 0) {
+            if (self.columns.indexOf(cell.get('key')) >= 0) {
 
                 var className = 'sorting';
                 if (cell.get('isActive') == 1) {
@@ -644,7 +586,7 @@ App.Customer.views.TableHeading = Backbone.View.extend({
                     }
                 }
 
-                html += '<th class="'+ className +'" data-sort="' + cell.get('code') + '">' + cell.get('label') + '</th>';
+                html += '<th class="'+ className +'" data-sort="' + cell.get('key') + '">' + cell.get('label') + '</th>';
             }
         });
 
@@ -716,8 +658,8 @@ App.Customer.views.PaginatedView = Backbone.View.extend({
     $(function(){
 
         // for populating backbonejs properties
-        var key = '{{ section_id }}';
-        App.Customer.Container = $('#'+key);
+        var key = 'section-{{ section_id }}';
+        App.Customer.Container = $('#' + key);
 
         // customer model collection
         App.Customer.collections.customers = new App.Customer.collections.PaginatedCollection({
@@ -747,6 +689,16 @@ App.Customer.views.PaginatedView = Backbone.View.extend({
 
         // fetch customer collection and trigger views
         App.Customer.collections.customers.fetch();
+
+        var textInput = App.Customer.Container.find('input.search-query');
+        textInput.keypress(function(e){
+            // todo : auto search
+            if (e.which == 13) {
+                App.Customer.Container.find('div.adv-filters-buttons button.adv-filters-search').trigger('click');
+                return false;
+            }
+            return true;
+        });
 
     });
 </script>
