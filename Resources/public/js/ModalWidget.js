@@ -15,6 +15,7 @@ ModalWidget.prototype = {
         this.containerEl.delegate('button#modal-shared-submit', 'click', function(e){
             e.preventDefault();
             var self = $(this);
+            self.hide();
             var action = self.attr('data-action');
             widget.setAction(action);
             widget.submit();
