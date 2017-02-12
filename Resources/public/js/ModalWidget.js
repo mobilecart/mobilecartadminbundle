@@ -16,6 +16,7 @@ ModalWidget.prototype = {
             e.preventDefault();
             var self = $(this);
             self.hide();
+            self.parent().find('.spinner').show();
             var action = self.attr('data-action');
             widget.setAction(action);
             widget.submit();
@@ -115,6 +116,9 @@ ModalWidget.prototype = {
             },
             dataType: 'json',
             success: function(response){
+                window.location.reload(true);
+            },
+            error: function(){
                 window.location.reload(true);
             }
         });
