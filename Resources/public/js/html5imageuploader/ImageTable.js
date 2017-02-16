@@ -15,7 +15,7 @@ ImageTable.prototype = {
             '<td>' + obj.code + '</td>' +
             '<td><input type="number" class="image-sort-order" value="1" /></td>' +
             '<td><input type="checkbox" class="image-is-default" value="1" /></td>' +
-            '<td><textarea class="image-alt-text"></textarea></td>' +
+            '<td><textarea class="form-control image-alt-text"></textarea></td>' +
             '<td><a href="#" class="btn btn-default image-remove-btn"><i class="glyphicon glyphicon-remove"> </i></a></td>' +
             '</tr>';
 
