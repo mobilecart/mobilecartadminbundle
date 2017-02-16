@@ -10,12 +10,13 @@ ImageTable.prototype = {
         var html = '';
 
         html += '<tr data-id="' + obj.id + '">' +
-            '<td><a href="#" class="image-remove-btn"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>' +
+            '<td><a target="_blank" href="/'+ obj.relative_path +'">View</a></td>' +
             '<td>' + obj.width + ' x ' + obj.height + '</td>' +
             '<td>' + obj.code + '</td>' +
             '<td><input type="number" class="image-sort-order" value="1" /></td>' +
             '<td><input type="checkbox" class="image-is-default" value="1" /></td>' +
             '<td><textarea class="image-alt-text"></textarea></td>' +
+            '<td><a href="#" class="btn btn-default image-remove-btn"><i class="glyphicon glyphicon-remove"> </i></a></td>' +
             '</tr>';
 
         return html;
