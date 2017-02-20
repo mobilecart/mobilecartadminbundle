@@ -2,9 +2,11 @@
     <li class="active">
         <a href="#section-shipments" data-toggle="tab" aria-expanded="false">Shipments</a>
     </li>
+    <!--
     <li class="">
         <a href="#section-shipping" data-toggle="tab" aria-expanded="true">Add Shipment</a>
     </li>
+    -->
 </ul>
 <div class="tab-content">
     <div id="section-shipments" class="tab-pane tab-panel fade active in">
@@ -14,17 +16,30 @@
                 <thead class="">
                     <tr>
                         <th>&nbsp;</th>
-                        <th>Company</th>
+                        <th>Name</th>
+                        <th>Address</th>
                         <th>Method</th>
-                        <th>Price</th>
                     </tr>
                 </thead>
                 <tbody class="selected-method-list">
-
+                {% for shipment in shipments %}
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>{{ shipment.name }}</td>
+                    <td>{{ shipment.street }}
+                        {% if shipment.street2|length >0 %}<br>{{ shipment.street2 }}{% endif %}
+                        <br>{{ shipment.city }}, {{ shipment.region }} {{ shipment.postcode }}
+                        <br>{{ shipment.countryid }}
+                    </td>
+                    <td>{{ shipment.company }} {{ shipment.method }}</td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!--
     <div id="section-shipping" class="tab-pane tab-panel fade">
         <table class="table table-bordered table-striped table-hover dataTable">
             <thead class="">
@@ -40,4 +55,5 @@
             </tbody>
         </table>
     </div>
+    -->
 </div>
