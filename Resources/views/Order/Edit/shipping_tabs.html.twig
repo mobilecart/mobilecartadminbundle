@@ -19,6 +19,7 @@
                         <th>Name</th>
                         <th>Address</th>
                         <th>Method</th>
+                        <th>Tracking</th>
                     </tr>
                 </thead>
                 <tbody class="selected-method-list">
@@ -32,6 +33,9 @@
                         <br>{{ shipment.countryid }}
                     </td>
                     <td>{{ shipment.company }} {{ shipment.method }}</td>
+                    <td>
+                        <textarea class="form-control" name="tracking[{{ shipment.id }}]">{{ shipment.tracking }}</textarea>
+                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>
