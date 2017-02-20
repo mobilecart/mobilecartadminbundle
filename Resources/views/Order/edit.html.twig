@@ -36,11 +36,12 @@
             App.Product.views.selectedproducts.render();
 
             // update shipments
+            /*
             App.Shipping.collections.shipments = new App.Shipping.collections.SelectedMethodCollection(aCart.shipments);
             App.Shipping.views.shipments = new App.Shipping.views.SelectedMethodList({
                 collection: App.Shipping.collections.shipments
             });
-            App.Shipping.views.shipments.render();
+            App.Shipping.views.shipments.render(); //*/
 
             // update discounts
             App.Discount.collections.selecteddiscounts = new App.Discount.collections.SelectedDiscountCollection(aCart.discounts);
