@@ -20,7 +20,7 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-6">
-                                <h4>{% block subheader_text %}Edit{% endblock %}</h4>
+                                {% block left_buttons %}<h4>{% block subheader_text %}Edit{% endblock %}</h4>{% endblock %}
                             </div>
                             <div class="col-xs-6">
                                 {% block right_buttons %} {% endblock %}
