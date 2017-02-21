@@ -15,24 +15,23 @@
             <table class="table table-bordered table-striped table-hover dataTable">
                 <thead class="">
                     <tr>
-                        <th>&nbsp;</th>
-                        <th>Name</th>
                         <th>Address</th>
                         <th>Method</th>
+                        <th>Price</th>
                         <th>Tracking</th>
                     </tr>
                 </thead>
                 <tbody class="selected-method-list">
                 {% for shipment in shipments %}
                 <tr>
-                    <td>&nbsp;</td>
-                    <td>{{ shipment.name }}</td>
-                    <td>{{ shipment.street }}
+                    <td>{{ shipment.name }}
+                        <br>{{ shipment.street }}
                         {% if shipment.street2|length >0 %}<br>{{ shipment.street2 }}{% endif %}
                         <br>{{ shipment.city }}, {{ shipment.region }} {{ shipment.postcode }}
                         <br>{{ shipment.countryid }}
                     </td>
                     <td>{{ shipment.company }} {{ shipment.method }}</td>
+                    <td>{{ decorate(shipment.price) }}</td>
                     <td>
                         <textarea class="form-control" name="tracking[{{ shipment.id }}]">{{ shipment.tracking }}</textarea>
                     </td>

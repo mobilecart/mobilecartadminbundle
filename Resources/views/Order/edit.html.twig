@@ -1,5 +1,5 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
-{% block header_text %}Order {{ order.get('reference_nbr') }}{% endblock %}
+{% block header_text %}Order# {{ order.get('reference_nbr') }}{% endblock %}
 {% block left_buttons %}{{ form_widget(form.status) }}{% endblock %}
 {% block above_form %}
     <div class="row">
