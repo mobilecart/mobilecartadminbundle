@@ -131,13 +131,23 @@
             settings.onDropped && settings.onDropped(success);
         }
 
+        function scaleAndCropImage(img) {
+            var canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img,0,0);
+            settings.onProcessed && settings.onProcessed(canvas);
+            return canvas;
+        }
+
         /**
          * Scale and crop image.
          *
          * @param img HTMLElement Image object
          * @return HTMLElement Canvas element of scaled and cropped image
          */
-        function scaleAndCropImage(img) {
+        function scaleAndCropImageOld(img) {
 
             var cropRatio = settings.cropRatio;
             var originalWidth = img.width;
