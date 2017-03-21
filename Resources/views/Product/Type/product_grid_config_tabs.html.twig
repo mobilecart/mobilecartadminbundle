@@ -29,7 +29,6 @@
                             <tr>
                                 <th>&nbsp;</th>
                                 <th>ID</th>
-                                <th>Type</th>
                                 <th>Name</th>
                                 <th>Sku</th>
                                 <th>Price</th>
@@ -39,9 +38,8 @@
                         <tbody class="child-product-list">
                         {% for product in child_products %}
                             <tr>
-                                <td><input type="checkbox" id="child-id-{{ product.id }}" name="config_ids[{{ product.id }}]" value="{{ product.id }}" checked="checked" /></td>
+                                <td><input type="checkbox" id="child-id-{{ product.id }}" name="simple_ids[{{ product.id }}]" value="{{ product.id }}" checked="checked" /></td>
                                 <td>{{ product.id }}</td>
-                                <td>{{ product.type }}</td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.sku }}</td>
                                 <td>{{ product.price }}</td>
@@ -57,56 +55,64 @@
     </div>
     <div id="section-search" class="tab-pane fade">
 
-        <div class="panel panel-default adv-filters">
+        <div class="panel panel-default adv-filters tab-panel">
             <div class="panel-heading">
-                <a data-toggle="collapse" data-parent="#accordion" href="#{{ section_id }}-filters-panel"><i class="fa fa-wrench fa-fw"></i> Search Filters</a>
+                <div class="row">
+
+                    <div class="col-xs-3">
+                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default search-clear" type="button" style="visibility:hidden;">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </span>
+                            <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="pull-right adv-filters-buttons">
+                            <button class="btn btn-default adv-filters-search">
+                                <i class="fa fa-search"> </i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="panel-body panel-collapse in" id="{{ section_id }}-filters-panel">
+            <div class="panel-body panel-collapse collapse" id="{{ section_id }}-filters-panel">
                 <div id="{{ section_id }}-filters-container" class="filters-container">
 
                 </div>
             </div>
         </div>
-
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-5 grid-pager pull-left">
-
-                    </div>
-                    <div class="col-md-3">
-
-                        <div class="pull-left">
-                            <label>Show</label>
-                            <select name="per_page">
-                                <option value="15">15</option>
-                                <option selected="selected" value="30">30</option>
-                                <option value="45">45</option>
-                                <option value="60">60</option>
-                            </select>
+                    <div class="col-xs-2 pull-left">
+                        <div class="input-group mass-actions">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default check-all" type="button">
+                                    <input type="checkbox" value="1" class="check-all" name="configproduct_check_all" />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4 adv-filters-buttons">
-                        <div class="pull-right">
-                            <button class="btn btn-primary adv-filters-search">Search</button>
-                        </div>
+                    <div class="col-xs-4">
+
+                    </div>
+                    <div class="col-xs-6 grid-pager">
+
                     </div>
                 </div>
-
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover dataTable">
                         <thead class="grid-header">
-                        <tr>
-                            <th><input type="checkbox" name="product_check_all" value="1" /></th>
-                            <th class="sorting_desc" data-sort="id">ID</th>
-                            <th class="sorting" data-sort="type">Type</th>
-                            <th class="sorting" data-sort="name">Name</th>
-                            <th class="sorting" data-sort="sku">Sku</th>
-                            <th class="sorting" data-sort="price">Price</th>
-                            <th class="sorting" data-sort="qty">Qty</th>
-                        </tr>
+
                         </thead>
                         <tbody class="product-list">
 

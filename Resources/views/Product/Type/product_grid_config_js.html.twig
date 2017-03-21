@@ -1,7 +1,6 @@
 <script type="text/template" id="configproduct-grid-single">
-    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="simple_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
     <td><%- id %></td>
-    <td><%- type %></td>
     <td><%- name %></td>
     <td><%- sku %></td>
     <td><%- price %></td>
@@ -9,16 +8,17 @@
 </script>
 
 <script type="text/html" id="configproduct-pagination-template">
-    <% if (currentPage != 1) { %>
-    <button class="prev btn-default btn">Prev</button>
-    <% } %>
 
-    <label for="page">Page</label>
-    <input type="number" value="<%= currentPage %>" name="page" id="configproduct-page" class="number"> of <%= totalPages %>
+    <div class="pull-right btn-group input-group paginator" role="group">
+        <button type="button" class="btn pull-left btn-default prev <% if (currentPage == 1) { %>disabled<% } %>" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </button>
+        <input type="number" id="category-page" class="form-control number paginator" name="page" value="<%= currentPage %>" />
+        <button type="button" class="btn pull-right btn-default next <% if (currentPage >= lastPage) { %>disabled<% } %>" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+        </button>
+    </div>
 
-    <% if (lastPage != currentPage && lastPage != 0) { %>
-    <button class="btn btn-default next">Next</button>
-    <% } %>
 </script>
 
 <script type="text/html" id="configproduct-grid-adv-filter">
@@ -49,9 +49,9 @@
         <% } %>
 
         <% if (remove) { %>
-        <a href="javascript:;" class="remove-filter"><i class="fa fa-times fa-lg"></i></a>
+        <a href="javascript:;" class="btn btn-default remove-filter"><i class="glyphicon glyphicon-remove"></i></a>
         <% } else { %>
-        <a href="javascript:;" class="add-filter"><i class="fa fa-plus fa-fw fa-lg"></i></a>
+        <a href="javascript:;" class="btn btn-default add-filter"><i class="glyphicon glyphicon-plus"></i></a>
         <% } %>
     </div>
 </script>
@@ -101,7 +101,8 @@ App.ConfigProduct.collections.PaginatedCollection = Backbone.PageableCollection.
             "1": 'desc'
         },
         currentPage: 'page',
-        format: 'json'
+        format: 'json',
+        type: '1'
     },
     parse: function(fullResponse) {
 
@@ -222,7 +223,6 @@ App.ConfigProduct.views.ProductView = Backbone.View.extend({
             var html = '<tr>';
             html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="config_ids['+product.get('id')+']" id="child-id-'+product.get('id')+'"></td>';
             html += '<td>' + product.get('id') + '</td>';
-            html += '<td>' + product.get('type') + '</td>';
             html += '<td>' + product.get('name') + '</td>';
             html += '<td>' + product.get('sku') + '</td>';
             html += '<td>' + product.get('price') + '</td>';
@@ -425,7 +425,7 @@ App.ConfigProduct.views.GridFilterView = Backbone.View.extend({
         var link = $(e.currentTarget);
         link.removeClass('add-filter');
         link.addClass('remove-filter');
-        link.html('<i class="fa fa-times fa-lg"></i>');
+        link.html('<i class="glyphicon glyphicon-remove"></i>');
         var choices = [];
 
         var ops = [];
@@ -500,7 +500,7 @@ App.ConfigProduct.views.TableButtons = Backbone.View.extend({
 App.ConfigProduct.views.TableHeading = Backbone.View.extend({
     el : 'table thead.grid-header',
     tagName: 'tr',
-    columns: ['id','type','name','sku','price','qty'],
+    columns: ['id','name','sku','price','qty'],
     events: {
         'click th': 'gotoPage',
         'click button.adv-filters-search': 'updateSearch'
