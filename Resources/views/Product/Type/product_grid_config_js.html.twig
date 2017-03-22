@@ -1,5 +1,5 @@
 <script type="text/template" id="configproduct-grid-single">
-    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="simple_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="config_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
     <td><%- id %></td>
     <td><%- name %></td>
     <td><%- sku %></td>
@@ -23,7 +23,6 @@
 
 <script type="text/html" id="configproduct-grid-adv-filter">
     <div class="filter">
-        <label>Filter</label>
         <select name="filter_field[<%= counter %>]" class="adv-filter-field">
             <% _.each(fields, function(field) { %>
             <option value="<%= field.code %>" data-type="<%= field.type %>"
@@ -64,7 +63,6 @@ App.ConfigProduct.collections = {};
 App.ConfigProduct.collections.dynamic = {};
 App.ConfigProduct.views = {};
 App.ConfigProduct.views.dynamic = {};
-
 
 // Sortable
 App.ConfigProduct.models.Sortable = Backbone.Model.extend({});
@@ -222,7 +220,7 @@ App.ConfigProduct.views.ProductView = Backbone.View.extend({
         } else {
             var panel = App.ConfigProduct.Container.find('table tbody.child-product-list');
             var html = '<tr>';
-            html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="config_ids['+product.get('id')+']" id="child-id-'+product.get('id')+'"></td>';
+            html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="simple_ids['+product.get('id')+']" id="child-id-'+product.get('id')+'"></td>';
             html += '<td>' + product.get('id') + '</td>';
             html += '<td>' + product.get('name') + '</td>';
             html += '<td>' + product.get('sku') + '</td>';
@@ -539,7 +537,6 @@ App.ConfigProduct.views.TableHeading = Backbone.View.extend({
         this.$el.html('');
 
         var html = '';
-        html += '<th><input type="checkbox" value="1" name="product_check_all"></th>';
 
         this.collection.each(function(cell) {
             if (self.columns.indexOf(cell.get('key')) >= 0) {
@@ -589,7 +586,8 @@ App.ConfigProduct.views.PaginatedView = Backbone.View.extend({
     events: {
         'click button.prev': 'gotoPrev',
         'click button.next': 'gotoNext',
-        'click a.page': 'gotoPage'
+        'click a.page': 'gotoPage',
+        'click button.check-all': 'checkAll'
     },
     template: _.template($('#configproduct-pagination-template').html()),
     initialize: function() {
@@ -598,7 +596,8 @@ App.ConfigProduct.views.PaginatedView = Backbone.View.extend({
         this.render();
     },
     render: function() {
-        this.$el.html(this.template(this.collection.state));
+        //this.$el.html(this.template(this.collection.state));
+        this.$el.find('div.grid-pager').html(this.template(this.collection.state));
         return this;
     },
     gotoPrev: function(e) {
@@ -616,6 +615,19 @@ App.ConfigProduct.views.PaginatedView = Backbone.View.extend({
         var page = $(e.target).text();
         this.collection.getPage(parseInt(page));
         return this;
+    },
+    checkAll: function(e) {
+        var self = this;
+
+        // trigger check all checkboxes
+        App.ConfigProduct.Container.find('tbody.product-list input.select-product').each(function(){
+            var self = $(this);
+            if (!self.is(':checked')) {
+                self.trigger('click');
+            }
+        });
+
+        return true;
     }
 });
 
@@ -643,7 +655,7 @@ $(function(){
     // pager controls
     App.ConfigProduct.views.pager = new App.ConfigProduct.views.PaginatedView({
         collection: App.ConfigProduct.collections.products,
-        el: App.ConfigProduct.Container.find('div.grid-pager')
+        el: App.ConfigProduct.Container.find('div.pager-row')
     });
 
     // grid buttons
@@ -653,23 +665,5 @@ $(function(){
 
     // fetch product collection and trigger views
     App.ConfigProduct.collections.products.fetch();
-
-    // todo:
-    // getters for is_in_stock without .isinstock (getter defined)
-    //  could use wrapper
-    // column configuration
-    //  can display, but not sort
-    // join / sort attribute values (left join)
-    //  can display, but not sort
-    // default filters eg product type
-    //  can enforce at widget level
-    //  or just hardcode into bbjs paginator
-    // saved searches
-    // php form handler (backend, obviously), use observers
-    // DONE: header cell format
-    // DONE: adv. filters options
-
-    // back to products link
-    // pager buttons, improve if possible
 });
 </script>
