@@ -38,7 +38,9 @@
                         <tbody class="child-product-list">
                         {% for product in child_products %}
                             <tr>
-                                <td><input type="checkbox" id="child-id-{{ product.id }}" name="simple_ids[{{ product.id }}]" value="{{ product.id }}" checked="checked" /></td>
+                                <td>
+                                    <input type="checkbox" id="child-id-{{ product.id }}" name="simple_ids[]" value="{{ product.id }}" checked="checked" />
+                                </td>
                                 <td>{{ product.id }}</td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.sku }}</td>

@@ -1,5 +1,7 @@
 <script type="text/template" id="configproduct-grid-single">
-    <td><input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="config_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td>
+        <input type="checkbox" class="select-product" id="configproduct-<%- id %>" name="config_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> />
+    </td>
     <td><%- id %></td>
     <td><%- name %></td>
     <td><%- sku %></td>
@@ -176,6 +178,22 @@ App.ConfigProduct.views.ProductList = Backbone.View.extend({
         view.selected = this.selected;
         this.$el.append(view.render().el);
         return this;
+    },
+    addSelected: function(productId) {
+        var self = this;
+        var idx = self.selected.indexOf(productId);
+        if (idx == -1) {
+            self.selected.push(productId);
+        }
+        return this;
+    },
+    removeSelected: function(productId) {
+        var self = this;
+        var idx = self.selected.indexOf(productId);
+        if (idx > -1) {
+            self.selected.splice(idx, 1);
+        }
+        return this;
     }
 });
 
@@ -194,7 +212,7 @@ App.ConfigProduct.views.ProductView = Backbone.View.extend({
     render: function() {
         var self = this;
         var product = this.model.toJSON();
-        var productId = product.id;
+        var productId = parseInt(product.id);
 
         if (self.selected.indexOf(productId) > -1) {
             product.checked = 1;
@@ -212,15 +230,27 @@ App.ConfigProduct.views.ProductView = Backbone.View.extend({
         var link = $(e.currentTarget);
         var idStr = link.attr('id');
         var idParts = idStr.split('-');
-        var id = idParts[1];
+        var id = parseInt(idParts[1]);
         var checkbox = $('input#child-id-' + id);
+
+        var idx = self.selected.indexOf(id);
         
         if (checkbox.length > 0) {
-            checkbox.parent().remove();
+            checkbox.parent().parent().remove();
+            if (idx > -1) {
+                self.selected.splice(idx, 1);
+            }
+            App.ConfigProduct.views.products.addSelected(id);
         } else {
+
+            if (idx == -1) {
+                self.selected.push(id);
+            }
+            App.ConfigProduct.views.products.removeSelected(id);
+
             var panel = App.ConfigProduct.Container.find('table tbody.child-product-list');
             var html = '<tr>';
-            html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="simple_ids['+product.get('id')+']" id="child-id-'+product.get('id')+'"></td>';
+            html += '<td><input type="checkbox" checked="checked" value="'+product.get('id')+'" name="simple_ids[]" id="child-id-'+product.get('id')+'"></td>';
             html += '<td>' + product.get('id') + '</td>';
             html += '<td>' + product.get('name') + '</td>';
             html += '<td>' + product.get('sku') + '</td>';
@@ -536,7 +566,7 @@ App.ConfigProduct.views.TableHeading = Backbone.View.extend({
         var self = this;
         this.$el.html('');
 
-        var html = '';
+        var html = '<th>&nbsp;</th>';
 
         this.collection.each(function(cell) {
             if (self.columns.indexOf(cell.get('key')) >= 0) {
