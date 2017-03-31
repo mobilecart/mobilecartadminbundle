@@ -550,6 +550,7 @@ div.header-buttons {
 
 div.listing-body {
     padding: 0;
+    border: none;
 }
 
 div.tab-panel {
@@ -570,10 +571,6 @@ div.adv-filters.tab-panel {
 
 div.tab-pane div.panel {
     margin-top: 15px;
-}
-
-table.table-bordered {
-    margin-top: 10px;
 }
 
 .nav-tabs > li.active > a.invalid-tab,

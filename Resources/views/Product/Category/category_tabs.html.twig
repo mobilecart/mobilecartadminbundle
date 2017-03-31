@@ -9,7 +9,7 @@
 <div class="tab-content">
     <div id="section-selected-cats" class="tab-pane fade active in">
         <div class="panel panel-default tab-panel">
-            <div class="panel-body">
+            <div class="panel-body listing-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover dataTable">
                         <thead class="grid-header">
@@ -30,18 +30,30 @@
     <div id="section-search-cats" class="tab-pane fade">
         <div class="panel panel-default adv-filters tab-panel">
             <div class="panel-heading">
-                <div class="row">
-                    <div class="col-sm-6">
+                <div class="row adv-filters-buttons">
+                    <div class="col-xs-3">
                         <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="pull-right adv-filters-buttons">
-                            <button class="btn btn-primary adv-filters-search">Search</button>
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default search-clear" type="button" style="visibility:hidden;">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </span>
+                            <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="pull-right">
+                            <button class="btn btn-default adv-filters-search">
+                                <i class="fa fa-search"> </i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="panel-body panel-collapse in" id="{{ section_id }}-filters-panel">
+            <div class="panel-body panel-collapse collapse" id="{{ section_id }}-filters-panel">
                 <div id="{{ section_id }}-filters-container" class="filters-container">
 
                 </div>
@@ -71,7 +83,7 @@
                 </div>
 
             </div>
-            <div class="panel-body">
+            <div class="panel-body listing-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover dataTable">
                         <thead class="grid-header">

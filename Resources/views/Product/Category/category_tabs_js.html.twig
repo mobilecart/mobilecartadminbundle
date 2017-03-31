@@ -1,11 +1,15 @@
 <script type="text/template" id="category-grid-single">
-    <td><input type="checkbox" class="select-category" id="category-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td>
+        <input type="checkbox" class="select-category" id="category-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> />
+    </td>
     <td><%- id %></td>
     <td><%- name %></td>
 </script>
 
 <script type="text/template" id="selected-category-grid-single">
-    <td><input type="checkbox" class="selected-category" id="selected-category-id-<%- id %>" name="category_ids[<%- id %>]"<% if (checked == 1) { %> checked="checked"<% } %> /></td>
+    <td>
+        <input type="checkbox" class="selected-category" id="selected-category-id-<%- id %>" value="<%- id %>" name="category_ids[]"<% if (checked == 1) { %> checked="checked"<% } %> />
+    </td>
     <td><%- id %></td>
     <td><%- name %></td>
 </script>
@@ -26,7 +30,6 @@
 
 <script type="text/html" id="category-grid-adv-filter">
     <div class="filter">
-        <label>Filter</label>
         <select name="filter_field[<%= counter %>]" class="adv-filter-field">
             <% _.each(fields, function(field) { %>
             <option value="<%= field.code %>" data-type="<%= field.type %>"
@@ -109,7 +112,8 @@ App.Category.collections.PaginatedCollection = Backbone.PageableCollection.exten
             "1": 'desc'
         },
         currentPage: 'page',
-        format: 'json'
+        format: 'json',
+        q: ''
     },
     parse: function(fullResponse) {
 
@@ -168,7 +172,7 @@ App.Category.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
 //View for category listing
 App.Category.views.CategoryList = Backbone.View.extend({
-    el : '.category-list',
+    el : 'tbody.category-list',
     selected: [],
     selected_view: {},
     initialize: function() {
@@ -189,6 +193,22 @@ App.Category.views.CategoryList = Backbone.View.extend({
     },
     removeSelectedCategoryViewById: function(id) {
         this.selected_view.removeCategoryViewById(id);
+    },
+    addSelected: function(id) {
+        var self = this;
+        var idx = self.selected.indexOf(id);
+        if (idx == -1) {
+            self.selected.push(id);
+        }
+        return this;
+    },
+    removeSelected: function(id) {
+        var self = this;
+        var idx = self.selected.indexOf(id);
+        if (idx > -1) {
+            self.selected.splice(idx, 1);
+        }
+        return this;
     }
 });
 
@@ -208,8 +228,7 @@ App.Category.views.CategoryView = Backbone.View.extend({
     render: function() {
         var self = this;
         var category = this.model.toJSON();
-        var categoryId = category.id;
-
+        var categoryId = parseInt(category.id);
         if (self.selected.indexOf(categoryId) > -1) {
             category.checked = 1;
         } else {
@@ -230,13 +249,10 @@ App.Category.views.CategoryView = Backbone.View.extend({
 
         // find checkbox in selected area
         var checkbox = $('input#selected-category-id-' + id);
-
         if (checkbox.length > 0) {
-
             // remove row
             self.parent_view.removeSelectedCategoryViewById(id);
         } else {
-
             // add row
             this.parent_view.selected_view.addOne(category);
         }
@@ -552,13 +568,16 @@ App.Category.views.TableButtons = Backbone.View.extend({
     tagName: 'div',
     className: 'pull-right',
     events: {
-        'click button.adv-filters-search': 'updateSearch'
+        'click button.adv-filters-search': 'updateSearch',
+        'click button.search-clear': 'clearAction',
+        'keydown input.search-query': 'keyAction'
     },
     initialize: function() {
 
     },
     updateSearch: function (e) {
         e.preventDefault();
+        var self = this;
 
         // filter fields
         App.Category.collections.categories.queryParams.filter_field = [];
@@ -581,10 +600,30 @@ App.Category.views.TableButtons = Backbone.View.extend({
             App.Category.collections.categories.queryParams.filter_val.push(self.val());
         });
 
+        // search text
+        App.Category.collections.categories.queryParams.q = self.$el.find('input.search-query').val();
+
         App.Category.collections.categories.currentPage = 1;
         App.Category.collections.categories.fetch();
 
         return false;
+    },
+    clearAction: function(e) {
+        var self = this;
+        self.$el.find('input.search-query').val('');
+        self.$el.find('button.search-clear').css('visibility', 'hidden');
+        self.updateSearch(e);
+        return true;
+    },
+    keyAction: function(e) {
+        var self = this;
+        var code = e.keyCode || e.which;
+        self.$el.find('button.search-clear').css('visibility', 'visible');
+        if (code == 13) {
+            self.updateSearch(e);
+            return false;
+        }
+        return true;
     }
 });
 

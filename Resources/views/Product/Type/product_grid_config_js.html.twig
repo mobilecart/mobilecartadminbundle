@@ -179,17 +179,17 @@ App.ConfigProduct.views.ProductList = Backbone.View.extend({
         this.$el.append(view.render().el);
         return this;
     },
-    addSelected: function(productId) {
+    addSelected: function(id) {
         var self = this;
-        var idx = self.selected.indexOf(productId);
+        var idx = self.selected.indexOf(id);
         if (idx == -1) {
-            self.selected.push(productId);
+            self.selected.push(id);
         }
         return this;
     },
-    removeSelected: function(productId) {
+    removeSelected: function(id) {
         var self = this;
-        var idx = self.selected.indexOf(productId);
+        var idx = self.selected.indexOf(id);
         if (idx > -1) {
             self.selected.splice(idx, 1);
         }
