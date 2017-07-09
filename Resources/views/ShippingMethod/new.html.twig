@@ -1,14 +1,9 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
 {% block header_text %}Create Shipping Method{% endblock %}
 {% block subheader_text %}Shipping Method Form{% endblock %}
-{% block above_form %}
-    <div class="row">
-        <div class="col-xs-12 header-buttons">
-            <a href="{{ renderGridBackUrl('cart_admin_shipping_method') }}" class="btn btn-default">Back</a>
-        </div>
-    </div>
+{% block back_button %}
+    <a href="{{ renderGridBackUrl('cart_admin_shipping_method') }}" class="btn btn-default">Back</a>
 {% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     <link href="{{ asset('bundles/mobilecartadmin/css/discount.css') }}" rel="stylesheet">

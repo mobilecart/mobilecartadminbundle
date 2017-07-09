@@ -11,17 +11,24 @@ AdminFormWidget.prototype = {
         var widget = this;
 
         // on submit
-        widget.formEl.submit(function(e){
+        widget.formEl.on('submit', function(e){
             e.preventDefault();
             var self = $(this);
-            widget.submitForm(self);
+            widget.submitForm();
             return false;
         });
 
+        widget.buttonEl.on('click', function(e){
+            e.preventDefault();
+            var self = $(this);
+            widget.submitForm();
+            return true;
+        });
     },
-    submitForm: function(formEl) {
+    submitForm: function() {
         var widget = this;
 
+        var formEl = widget.formEl;
         widget.buttonEl.hide();
         widget.buttonEl.siblings('.spinner').show();
 

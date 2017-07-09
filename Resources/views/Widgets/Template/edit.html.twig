@@ -9,6 +9,18 @@
         </div>
 
         {% block above_form %}
+        <div class="row">
+            <div class="col-xs-12 header-buttons">
+            {% block back_button %} {% endblock %}
+            {% block save_button %}
+                <button type="submit" class="btn btn-success" id="form-submit">Save</button>
+                <span class="text-center spinner" style="display:none;">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                </span>
+            {% endblock %}
+            {% block above_form_buttons %} {% endblock %}
+            </div>
+        </div>
         {% endblock %}
 
         <div class="row admin-form">
@@ -23,12 +35,8 @@
                                 {% block left_buttons %}<h4>{% block subheader_text %}Edit{% endblock %}</h4>{% endblock %}
                             </div>
                             <div class="col-xs-6">
-                                {% block right_buttons %} {% endblock %}
                                 <div class="pull-right">
-                                    <button type="submit" class="btn btn-success" id="form-submit">Save</button>
-                                    <div class="text-center spinner" style="display:none;">
-                                        <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
-                                    </div>
+                                    {% block right_buttons %} {% endblock %}
                                 </div>
                             </div>
                         </div>
@@ -111,26 +119,29 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('bundles/mobilecartadmin/js/spin.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ModalWidget.js') }}"></script>
+
     <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/admin-form-widget.js') }}"></script>
     <script type="text/javascript">
 
         var formEl = $('div.admin-form form');
-
-        // handle modal UI
-        var modalWidget = new ModalWidget({
-            containerEl: $('#modal-shared'),
-            actions: []
-        });
+        var buttonEl = $('button#form-submit');
 
         // handle admin form, ajax request/response
         var formWidget = new AdminFormWidget({
             formEl: formEl,
             elPrefix: formEl.attr('name'),
-            buttonEl: $('button#form-submit')
+            buttonEl: buttonEl
         });
 
+    </script>
+
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ModalWidget.js') }}"></script>
+    <script type="text/javascript">
+        // handle modal UI
+        var modalWidget = new ModalWidget({
+            containerEl: $('#modal-shared'),
+            actions: []
+        });
     </script>
 
     {% for section, sectionData in template_sections %}
