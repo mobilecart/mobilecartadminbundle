@@ -1,0 +1,54 @@
+{% extends admin() %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h1 class="page-header">{% block header_text %}Export{% endblock %}</h1>
+        </div>
+    </div>
+
+    {% block above_form %}
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            {% block back_button %} {% endblock %}
+            {% block save_button %}
+                <button type="submit" class="btn btn-success" id="form-submit">Export</button>
+                <span class="text-center spinner" style="display:none;">
+                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+            </span>
+            {% endblock %}
+            {% block above_form_buttons %} {% endblock %}
+        </div>
+    </div>
+    {% endblock %}
+
+    <div class="row admin-form">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    {% block container_start %}
+        <div class="col-sm-12">
+    {% endblock %}
+
+            {{ form_row(form.offsetGet('export_option')) }}
+            {{ form_row(form.offsetGet('start_date')) }}
+            {{ form_row(form.offsetGet('end_date')) }}
+
+    {% block container_end %}
+        </div>
+    {% endblock %}
+    {{ form_end(form) }}
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        var formEl = $('div.admin-form form');
+        var buttonEl = $('button#form-submit');
+        buttonEl.on('click', function(e){
+            formEl.submit();
+        });
+    </script>
+
+{% endblock %}
