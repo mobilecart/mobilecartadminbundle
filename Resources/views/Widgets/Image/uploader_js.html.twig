@@ -1,7 +1,7 @@
 <link href="{{ asset('bundles/mobilecartadmin/css/html5imageuploader/uploader-style.css') }}" rel="stylesheet" type="text/css" />
 <script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/jquery.html5uploader-1.1.js') }}"></script>
 <script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/exif.js') }}"></script>
-<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/ImageTable.js') }}"></script>
+<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/image-table.js') }}"></script>
 <script type="text/javascript">
 
     // ImageTable instance
@@ -10,6 +10,7 @@
     });
 
     var imageSection = $('div#section-image-upload');
+    var imageList = $('div#section-image-list');
     var parentEl = imageSection.parent();
 
     imageSection.find('.media-drop').each(function(){
@@ -87,6 +88,7 @@
                     modalWidget.setLabel('Error');
                 }
                 modalWidget.setBody(response.message);
+                imageTable.serialize();
                 $('#modal-shared').modal('show');
             },
 
@@ -118,22 +120,22 @@
             parentEl.find('.dropbox').show();
             self.hide();
         });
-
-        // add listeners to listing tab
-        //  delete row
-        //  rebuild hidden input
-        // wrap hidden input(s)
-        $('button#form-submit').on('click', function(e){
-            imageTable.serialize();
-        });
     });
 
-    $('div#section-image-list').on('click', 'a.image-remove-btn', function(e) {
+    imageList.on('click', 'a.image-remove-btn', function(e) {
         e.preventDefault();
         var self = $(this);
         var trEl = self.parent().parent();
         trEl.remove();
+        imageTable.serialize();
         return false;
+    });
+
+    imageList.on('click', 'input.image-is-default', function(e) {
+        //e.preventDefault();
+        var self = $(this);
+        imageTable.serialize();
+        return true;
     });
 
 </script>
