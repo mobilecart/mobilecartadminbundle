@@ -4,6 +4,11 @@
 {% block back_button %}
     <a href="{{ renderGridBackUrl('cart_admin_product') }}" class="btn btn-default">Back</a>
 {% endblock %}
+{% block above_form_buttons %}
+    <form style="display: inline;" method="post" action="{{ path('cart_admin_product_duplicate', {'id': entity.id}) }}">
+        <button class="btn btn-default" type="submit">Duplicate</button>
+    </form>
+{% endblock %}
 {% block javascripts %}
 {{ parent() }}
     <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/lib/wysiwyg/wysiwyg.js') }}"></script>
