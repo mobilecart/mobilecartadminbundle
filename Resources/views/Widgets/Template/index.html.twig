@@ -27,7 +27,7 @@
             <li>
                 <a href="#">{{ facets.label }}<span class="fa arrow"></span></a>
                 <ul class="nav nav-third-level collapse">
-                    {% for termCounts in facets.terms %}
+                    {% for termCounts in facets.terms if termCounts.term|length > 0 %}
                     <li class="{% if facets.isActive %}active {% endif %}">
                     {% if termCounts.remove_url is defined and termCounts.remove_url|length > 0 %}
                         <a href="{{ termCounts.remove_url }}" class="active">{{ termCounts.term }}
