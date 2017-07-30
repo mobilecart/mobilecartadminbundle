@@ -61,6 +61,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            {# Add your company name here .. by extending this template first, of course #}
             {% block brand %}<span class="navbar-brand">mobilecart.io</span>{% endblock %}
         </div>
         {% block navigation %}
@@ -129,7 +130,7 @@
                     <li><a href="{{ path('cart_admin_order') }}">Orders</a></li>
                     <li><a href="{{ path('cart_admin_order_item') }}">Order Items</a></li>
                     <li><a href="{{ path('cart_admin_discount') }}">Discounts</a></li>
-                    <li><a href="{{ path('cart_admin_shipping_method') }}">Shipping Method</a></li>
+                    <li><a href="{{ path('cart_admin_shipping_method') }}">Shipping Methods</a></li>
                 </ul>
             </li>
 
