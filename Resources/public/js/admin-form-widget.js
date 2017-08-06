@@ -13,14 +13,13 @@ AdminFormWidget.prototype = {
         // on submit
         widget.formEl.on('submit', function(e){
             e.preventDefault();
-            var self = $(this);
             widget.submitForm();
             return false;
         });
 
+        // on click
         widget.buttonEl.on('click', function(e){
             e.preventDefault();
-            var self = $(this);
             widget.submitForm();
             return true;
         });
