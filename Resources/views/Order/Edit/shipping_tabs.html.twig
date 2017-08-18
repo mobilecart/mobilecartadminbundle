@@ -2,11 +2,9 @@
     <li class="active">
         <a href="#section-shipments" data-toggle="tab" aria-expanded="false">Shipments</a>
     </li>
-    <!--
-    <li class="">
-        <a href="#section-shipping" data-toggle="tab" aria-expanded="true">Add Shipment</a>
+    <li>
+        <a class="btn btn-success" href="{{ path('cart_admin_order_shipment_new', {'order_id': order.id }) }}">Create</a>
     </li>
-    -->
 </ul>
 <div class="tab-content">
     <div id="section-shipments" class="tab-pane tab-panel fade active in">
@@ -15,6 +13,7 @@
             <table class="table table-bordered table-striped table-hover dataTable">
                 <thead class="">
                     <tr>
+                        <th>ID</th>
                         <th>Address</th>
                         <th>Method</th>
                         <th>Price</th>
@@ -24,6 +23,9 @@
                 <tbody class="selected-method-list">
                 {% for shipment in shipments %}
                 <tr>
+                    <td>
+                        <a class="btn btn-default" href="{{ path('cart_admin_order_shipment_edit', {'id': shipment.id }) }}">Edit</a>
+                    </td>
                     <td>{{ shipment.name }}
                         <br>{{ shipment.street }}
                         {% if shipment.street2|length >0 %}<br>{{ shipment.street2 }}{% endif %}
@@ -41,22 +43,4 @@
             </table>
         </div>
     </div>
-
-    <!--
-    <div id="section-shipping" class="tab-pane tab-panel fade">
-        <table class="table table-bordered table-striped table-hover dataTable">
-            <thead class="">
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>Company</th>
-                    <th>Method</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody class="method-list">
-
-            </tbody>
-        </table>
-    </div>
-    -->
 </div>
