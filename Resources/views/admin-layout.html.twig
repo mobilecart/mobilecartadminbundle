@@ -113,17 +113,6 @@
                 <a href="{{ path('cart_admin_customer') }}"><i class="fa fa-users fa-fw"></i> Customers</a>
             </li>
 
-            {#
-            <li>
-                <a href="#"><i class="glyphicon glyphicon-calendar"></i> &nbsp;Subscriptions<span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{ path('cart_admin_subscription') }}">Subscriptions</a></li>
-                    <li><a href="{{ path('cart_admin_subscription_customer') }}">Customers</a></li>
-                    <li><a href="#">Payments</a></li>
-                </ul>
-            </li>
-            #}
-
             <li>
                 <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Sales<span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
@@ -149,12 +138,11 @@
                 <!-- /.nav-second-level -->
             </li>
 
-            <li>
-                <a href="{{ path('cart_admin_config_setting') }}"><i class="fa fa-gears fa-fw"></i> Config Settings</a>
-            </li>
             {% endblock %}
-
         </ul>
+
+        {{ knp_menu_render(cartMenu('admin_dashboard'), {'allow_safe_labels':true}) }}
+
         <!-- /#side-menu -->
     </div>
     <!-- /.sidebar-collapse -->
