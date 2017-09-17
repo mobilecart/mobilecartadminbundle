@@ -1,8 +1,8 @@
 <ul class="nav nav-tabs">
-    <li class="active in">
+    <li class="active in tab-customer-selected">
         <a href="#section-customer-form" data-toggle="tab" aria-expanded="false">Selected Customer</a>
     </li>
-    <li class="">
+    <li class="tab-customer-search">
         <a href="#section-customers" data-toggle="tab" aria-expanded="true">Search</a>
     </li>
 </ul>
@@ -10,13 +10,43 @@
     <div id="section-customer-form" class="tab-pane fade active in">
         <div class="panel panel-default tab-panel">
             <div class="panel-body">
+
+                {% if not entity.get('id') > 0 %}
+                <div class="form-group">
+                    <select class="form-control" name="customer_strategy">
+                        <option value="existing" selected="selected">Existing Customer</option>
+                        <option value="guest">Guest Order</option>
+                        <option value="new">New Customer</option>
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="control-label">Customer ID{% if entity.get('customer_id') > 0 %} <a href="{{ path('cart_admin_customer_edit', {'id': entity.get('customer_id')}) }}" target="_blank">View</a>{% endif %}</label>
+                    <input {% if entity.get('id') > 0 %}readonly{% endif %} class="form-control" type="number" name="customer_id" id="customer_id" value="{% if entity.get('customer_id') > 0 %}{{ entity.get('customer_id') }}{% endif %}" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Email</label>
+                    <input {% if entity.get('id') > 0 %}readonly{% endif %} class="form-control" type="text" name="email" id="email" value="{{ entity.get('email') }}" />
+                </div>
+
+                {% if not entity.get('id') > 0 %}
+                <div class="form-group password-inputs" style="display: none;">
+                    <label class="control-label">New Password</label>
+                    <input class="form-control" type="password" name="customer_password" id="customer_password" value="" />
+                </div>
+
+                <div class="form-group password-inputs" style="display: none;">
+                    <label class="control-label">Confirm New Password</label>
+                    <input class="form-control" type="password" name="customer_password_confirm" id="customer_password_confirm" value="" />
+                </div>
+                {% endif %}
+
                 {% for field in form_elements %}
                     {{ form_row(form.offsetGet(field)) }}
                 {% endfor %}
             </div>
-        </div>
-        <div class="hide">
-            <input type="hidden" name="customer_id" id="customer_id" value="{{ customer_id }}" />
         </div>
     </div>
     <div id="section-customers" class="tab-pane fade">
@@ -25,7 +55,7 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-sm-3">
-                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
+                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Filters</a>
                     </div>
                     <div class="col-sm-6">
                         <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
@@ -33,6 +63,9 @@
                     <div class="col-sm-3">
                         <div class="pull-right adv-filters-buttons">
                             <button class="btn btn-default adv-filters-search"><i class="fa fa-search"> </i></button>
+                            <span class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-2x fa-fw margin-bottom"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -47,10 +80,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-2">
-
-                    </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
 
                     </div>
                     <div class="col-sm-6" role="group">

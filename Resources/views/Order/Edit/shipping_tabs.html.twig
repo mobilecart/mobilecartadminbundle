@@ -3,12 +3,11 @@
         <a href="#section-shipments" data-toggle="tab" aria-expanded="false">Shipments</a>
     </li>
     <li>
-        <a class="btn btn-success" href="{{ path('cart_admin_order_shipment_new', {'order_id': order.id }) }}">Create</a>
+        <a class="btn btn-success" href="{{ path('cart_admin_order_shipment_new', {'order_id': entity.id }) }}">Create</a>
     </li>
 </ul>
 <div class="tab-content">
     <div id="section-shipments" class="tab-pane tab-panel fade active in">
-
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable">
                 <thead class="">

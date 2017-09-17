@@ -1,9 +1,9 @@
 <ul class="nav nav-tabs">
     <li class="active">
-        <a href="#section-applied" data-toggle="tab" aria-expanded="false">Discounts</a>
+        <a href="#section-applied" data-toggle="tab" aria-expanded="false">Selected Discounts</a>
     </li>
     <li class="">
-        <a href="#section-discounts" data-toggle="tab" aria-expanded="true">Add Discount</a>
+        <a href="#section-discount-search" data-toggle="tab" aria-expanded="true">Search</a>
     </li>
 </ul>
 <div class="tab-content">
@@ -31,17 +31,22 @@
             </table>
         </div>
     </div>
-    <div id="section-discounts" class="tab-pane fade">
-
+    <div id="section-discount-search" class="tab-pane fade">
         <div class="panel panel-default tab-panel adv-filters">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-6">
-                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
+                    <div class="col-sm-3">
+                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Filters</a>
                     </div>
                     <div class="col-sm-6">
+                        <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
+                    </div>
+                    <div class="col-sm-3">
                         <div class="pull-right adv-filters-buttons">
-                            <button class="btn btn-primary adv-filters-search">Search</button>
+                            <button class="btn btn-default adv-filters-search"><i class="fa fa-search"> </i></button>
+                            <span class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-2x fa-fw margin-bottom"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -52,31 +57,18 @@
                 </div>
             </div>
         </div>
-
-        <div class="panel panel-default tab-panel">
+        <div class="panel panel-default">
             <div class="panel-heading">
-
                 <div class="row">
-                    <div class="col-md-5 grid-pager pull-left">
+                    <div class="col-sm-6">
 
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-sm-6" role="group">
+                        <div class="grid-pager btn-group input-group pull-right paginator">
 
-                        <div class="pull-left">
-                            <label>Show</label>
-                            <select name="per_page">
-                                <option value="15">15</option>
-                                <option selected="selected" value="30">30</option>
-                                <option value="45">45</option>
-                                <option value="60">60</option>
-                            </select>
                         </div>
                     </div>
-                    <div class="col-md-4">
-
-                    </div>
                 </div>
-
             </div>
             <div class="panel-body listing-body">
                 <div class="table-responsive">

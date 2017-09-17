@@ -30,7 +30,7 @@
 <script type="text/html" id="product-pagination-template">
     <button type="button" class="prev btn-default btn <% if (currentPage == 1) { %> disabled <% } %>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></button>
     <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="form-control number paginator">
-    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= lastPage) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
+    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= totalPages) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
 </script>
 
 <script type="text/html" id="product-grid-adv-filter">
@@ -132,6 +132,17 @@ App.Product.collections.PaginatedCollection = Backbone.PageableCollection.extend
         var search = fullResponse.search;
         var columns = fullResponse.columns;
 
+        var sortBy = search.sortBy;
+        var sortDir = search.sortDir;
+        for (var x = 0; x < columns.length; x++) {
+            var column = columns[x];
+            if (column.key == sortBy) {
+                columns[x].isActive = 1;
+                columns[x].direction = sortDir;
+                break;
+            }
+        }
+
         // Set state
         this.state.totalRecords = parseInt(response.total);
         this.state.totalPages = parseInt(response.pages);
@@ -176,6 +187,10 @@ App.Product.collections.PaginatedCollection = Backbone.PageableCollection.extend
         //App.Product.collections.facets = new App.Product.collections.FacetCollection(response.facetCounts);
         //App.Product.views.facets = new App.Product.views.FacetCollectionView({collection: App.Product.collections.facets});
         //App.Product.views.facets.render();
+
+        var searchBtn = $('div#section-products button.adv-filters-search');
+        searchBtn.siblings('.spinner').hide();
+        searchBtn.show();
 
         return response.entities;
     }
@@ -265,7 +280,6 @@ App.Product.views.ProductView = Backbone.View.extend({
 
             // send update via ajax
             var url = App.serverURL + 'admin/order/remove/item';
-
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -298,6 +312,22 @@ App.Product.views.ProductView = Backbone.View.extend({
                 renderTabs(data.cart);
             });
         }
+
+        var selectedTab = $('div#section-products li.tab-products-selected');
+        var searchTab = $('div#section-products li.tab-products-search');
+        var selectedSection = $('div#section-products div#section-products-selected');
+        var searchSection = $('div#section-products div#section-products-search');
+
+        searchTab.removeClass('active');
+        searchTab.find('a').attr('aria-expanded', false);
+        selectedTab.addClass('active');
+        selectedTab.find('a').attr('aria-expanded', true);
+
+        searchSection.removeClass('active');
+        searchSection.removeClass('in');
+        selectedSection.addClass('active');
+        selectedSection.addClass('in');
+
     }
 });
 
@@ -649,6 +679,10 @@ App.Product.views.TableButtons = Backbone.View.extend({
     },
     updateSearch: function (e) {
         e.preventDefault();
+
+        var searchBtn = $(e.target);
+        searchBtn.hide();
+        searchBtn.siblings('.spinner').show();
 
         var queryText = App.Product.Container.find('input.search-query').val();
 

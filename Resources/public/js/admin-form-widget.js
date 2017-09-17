@@ -2,6 +2,7 @@ var AdminFormWidget = function(obj) {
     this.formEl = obj.formEl;
     this.elPrefix = obj.elPrefix;
     this.buttonEl = obj.buttonEl;
+    this.submitCallbacks = [];
     this.attachEvents();
     return this;
 };
@@ -13,26 +14,47 @@ AdminFormWidget.prototype = {
         // on submit
         widget.formEl.on('submit', function(e){
             e.preventDefault();
-            widget.submitForm();
+            if (widget.executeSubmitCallbacks()) {
+                widget.submitForm();
+            }
             return false;
         });
 
         // on click
         widget.buttonEl.on('click', function(e){
             e.preventDefault();
-            widget.submitForm();
+            if (widget.executeSubmitCallbacks()) {
+                widget.submitForm();
+            }
             return true;
         });
+    },
+    addSubmitCallback: function(callback) {
+        var widget = this;
+        widget.submitCallbacks.push(callback);
+        return widget;
+    },
+    executeSubmitCallbacks: function() {
+        var widget = this;
+        var isValid = true;
+        if (widget.submitCallbacks.length > 0) {
+            for (var x = 0; x < widget.submitCallbacks.length; x++) {
+                if (!widget.submitCallbacks[x]()) {
+                    isValid = false;
+                }
+            }
+        }
+        return isValid;
     },
     submitForm: function() {
         var widget = this;
 
+        $('.has-error').removeClass('has-error');
+        $('.invalid-tab').removeClass('invalid-tab');
+
         var formEl = widget.formEl;
         widget.buttonEl.hide();
         widget.buttonEl.siblings('.spinner').show();
-
-        $('.has-error').removeClass('has-error');
-        $('.invalid-tab').removeClass('invalid-tab');
 
         var formAction = formEl.attr('action');
         var actionSep = '?';
@@ -50,7 +72,7 @@ AdminFormWidget.prototype = {
                 widget.buttonEl.siblings('.spinner').hide();
                 widget.buttonEl.show();
 
-                if (typeof(response['success']) != 'undefined' && response.success == 1) {
+                if (typeof(response['success']) != 'undefined' && response.success == true) {
 
                     // redirect to success page
                     window.location = response.redirect_url;
@@ -73,6 +95,9 @@ AdminFormWidget.prototype = {
                             inputId = response.prefix + '_' + field;
                         }
                         var inputEl = $('#' + inputId);
+                        if (inputEl.length == 0) {
+                            inputEl = $('#' + field);
+                        }
                         inputEl.parent().addClass('has-error');
                     }
 

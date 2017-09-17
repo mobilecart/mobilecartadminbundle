@@ -11,50 +11,47 @@
 </script>
 
 <script type="text/html" id="discount-pagination-template">
-    <% if (currentPage != 1) { %>
-    <button class="prev btn-default btn">Prev</button>
-    <% } %>
-
-    <label for="page">Page</label>
-    <input type="number" value="<%= currentPage %>" name="page" id="discount-page" class="number"> of <%= totalPages %>
-
-    <% if (lastPage != currentPage && lastPage != 0) { %>
-    <button class="btn btn-default next">Next</button>
-    <% } %>
+    <button type="button" class="prev btn-default btn <% if (currentPage == 1) { %> disabled <% } %>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></button>
+    <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="form-control number paginator">
+    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= lastPage) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
 </script>
 
 <script type="text/html" id="discount-grid-adv-filter">
-    <div class="filter">
-        <label>Filter</label>
-        <select name="filter_field[<%= counter %>]" class="adv-filter-field">
-            <% _.each(fields, function(field) { %>
-            <option value="<%= field.code %>" data-type="<%= field.type %>"
-            <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
-            <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
-            <% }); %>
-        </select>
-
-        <select name="filter_op[<%= counter %>]" class="adv-filter-op">
-            <% _.each(ops, function(op) { %>
-            <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
-            <% }); %>
-        </select>
-
-        <% if (choices.length > 0) { %>
-        <select name="filter_val[<%= counter %>]" class="adv-filter-input">
-            <% _.each(choices, function(option) { %>
-            <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
-            <% }); %>
-        </select>
-        <% } else { %>
-        <input name="filter_val[<%= counter %>]" type="text" class="adv-filter-input" value="<%= value %>" />
-        <% } %>
-
-        <% if (remove) { %>
-        <a href="javascript:;" class="remove-filter"><i class="fa fa-times fa-lg"></i></a>
-        <% } else { %>
-        <a href="javascript:;" class="add-filter"><i class="fa fa-plus fa-fw fa-lg"></i></a>
-        <% } %>
+    <div class="filter row">
+        <div class="col-xs-4">
+            <select name="filter_field[<%= counter %>]" class="form-control adv-filter-field">
+                <% _.each(fields, function(field) { %>
+                <option value="<%= field.code %>" data-type="<%= field.type %>"
+                <% if (!_.isUndefined(field.selected)) { %> selected="selected"<% } %>
+                <% if (!_.isUndefined(field.choices)) { %> data-choices='{"choices":<%= JSON.stringify(field.choices) %>}'<% } %>><%= field.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-4">
+            <select name="filter_op[<%= counter %>]" class="form-control adv-filter-op">
+                <% _.each(ops, function(op) { %>
+                <option value="<%= op.code %>" data-types='{"types":<%= JSON.stringify(op.types) %>}'<% if (!_.isUndefined(op.selected)) { %> selected="selected"<% } %>><%= op.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-xs-3">
+            <% if (choices.length > 0) { %>
+            <select name="filter_val[<%= counter %>]" class="form-control adv-filter-input">
+                <% _.each(choices, function(option) { %>
+                <option value="<%= option.value %>"<% if (option.value == value) { %> selected="selected"<% } %>><%= option.label %></option>
+                <% }); %>
+            </select>
+            <% } else { %>
+            <input name="filter_val[<%= counter %>]" type="text" class="form-control adv-filter-input" value="<%= value %>" />
+            <% } %>
+        </div>
+        <div class="col-xs-1">
+            <% if (remove) { %>
+            <a href="javascript:;" class="remove-filter btn btn-default pull-right"><i class="glyphicon glyphicon-remove"> </i></a>
+            <% } else { %>
+            <a href="javascript:;" class="add-filter btn btn-default pull-right"><i class="glyphicon glyphicon-plus-sign"> </i></a>
+            <% } %>
+        </div>
     </div>
 </script>
 
@@ -114,6 +111,18 @@ App.Discount.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
         var response = fullResponse.result;
         var search = fullResponse.search;
+        var columns = fullResponse.columns;
+
+        var sortBy = search.sortBy;
+        var sortDir = search.sortDir;
+        for (var x = 0; x < columns.length; x++) {
+            var column = columns[x];
+            if (column.key == sortBy) {
+                columns[x].isActive = 1;
+                columns[x].direction = sortDir;
+                break;
+            }
+        }
 
         // Set state
         this.state.totalRecords = parseInt(response.total);
@@ -124,7 +133,7 @@ App.Discount.collections.PaginatedCollection = Backbone.PageableCollection.exten
                 App.Discount.views.sorting === null ||
                 typeof(App.Discount.collections.sorting) === 'undefined') {
 
-            App.Discount.collections.sorting = new App.Discount.collections.SortableCollection(search.sortable);
+            App.Discount.collections.sorting = new App.Discount.collections.SortableCollection(columns);
 
             App.Discount.views.sorting = new App.Discount.views.TableHeading({
                 collection: App.Discount.collections.sorting,
@@ -133,7 +142,7 @@ App.Discount.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
             App.Discount.views.sorting.render(); // view should be changing based on model changes
         } else {
-            App.Discount.collections.sorting.reset(search.sortable);
+            App.Discount.collections.sorting.reset(columns);
         }
 
         // handle adv. filters
@@ -170,15 +179,18 @@ App.Discount.views.DiscountList = Backbone.View.extend({
     selected: [],
     initialize: function() {
         var discounts = this.collection;
-        discounts.on('add', this.addOne, this);
-        this.render();
+        discounts.on('sync', this.render, this);
     },
     render: function() {
+        var self = this;
         this.$el.html('');
+        this.collection.each(function(model) {
+            self.addOne(model);
+        });
         return this;
     },
-    addOne: function(discount) {
-        var view = new App.Discount.views.DiscountView({ model: discount });
+    addOne: function(model) {
+        var view = new App.Discount.views.DiscountView({ model: model });
         view.selected = this.selected;
         this.$el.append(view.render().el);
         return this;
@@ -618,11 +630,10 @@ App.Discount.views.TableHeading = Backbone.View.extend({
         var self = this;
         this.$el.html('');
 
-        var html = '';
-        html += '<th><input type="checkbox" value="1" name="discount_check_all"></th>';
+        var html = '<th>&nsbp;</th>';
 
         this.collection.each(function(cell) {
-            if (self.columns.indexOf(cell.get('code')) >= 0) {
+            if (self.columns.indexOf(cell.get('key')) >= 0) {
 
                 var className = 'sorting';
                 if (cell.get('isActive') == 1) {
@@ -633,7 +644,7 @@ App.Discount.views.TableHeading = Backbone.View.extend({
                     }
                 }
 
-                html += '<th class="'+ className +'" data-sort="' + cell.get('code') + '">' + cell.get('label') + '</th>';
+                html += '<th class="'+ className +'" data-sort="' + cell.get('key') + '">' + cell.get('label') + '</th>';
             }
         });
 
@@ -706,7 +717,7 @@ App.Discount.views.PaginatedView = Backbone.View.extend({
 
         // for populating backbonejs properties
         var key = '{{ section_id }}';
-        App.Discount.Container = $('#'+key);
+        App.Discount.Container = $('#section-'+key);
 
         // discount model collection
         App.Discount.collections.discounts = new App.Discount.collections.PaginatedCollection({

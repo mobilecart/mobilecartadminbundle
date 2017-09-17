@@ -1,1 +1,21 @@
-<p>History</p>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover dataTable">
+        <thead class="">
+        <tr>
+            <th>User</th>
+            <th>Message</th>
+            <th>Created At</th>
+        </tr>
+        </thead>
+        <tbody class="selected-history-list">
+        {% for historyRow in history %}
+            <tr>
+                <td>{{ historyRow.get('user') }}</td>
+                <td>{{ historyRow.get('message') }}</td>
+                <td>{{ historyRow.get('created_at')|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+

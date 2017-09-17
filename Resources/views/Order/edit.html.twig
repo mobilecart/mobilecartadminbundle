@@ -1,5 +1,5 @@
 {% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
-{% block header_text %}Order# {{ order.get('reference_nbr') }}{% endblock %}
+{% block header_text %}Order# {{ entity.get('reference_nbr') }}{% endblock %}
 {% block left_buttons %}{{ form_widget(form.status) }}{% endblock %}
 {% block back_button %}
     <a href="{{ renderGridBackUrl('cart_admin_order') }}" class="btn btn-default">Back</a>
@@ -57,44 +57,16 @@
             App.Customer.views.updateForm(customer);
 
             cart = aCart;
+            $('#order_json').val(JSON.stringify(cart));
         }
 
         $(function() {
 
-            // hide/show shipping address inputs
-            function toggleShippingSame(checkbox) {
-                $('form .shipping-input').each(function(){
-                    var el = $(this);
-                    if (checkbox.prop('checked')) {
-                        el.hide();
-                        el.siblings().hide();
-                    } else {
-                        el.show();
-                        el.siblings().show();
-                    }
-                });
-            }
-
-            var cartJson = $('#mobilecart_corebundle_order_json');
-
-            var checkbox = $('#mobilecart_corebundle_order_is_shipping_same');
-            checkbox.click(function(e){
-                toggleShippingSame($(this));
-            });
-            toggleShippingSame(checkbox);
-
-            // render tabs
             renderTabs(cart);
 
-            // handle change of shipping address info
-            $('div.admin-form form .shipping-input').change(function(e){
-
-            });
-
-            // handle form submission
-            $('div.admin-form form').submit(function(e){
-                var cartStr = JSON.stringify(cart);
-                cartJson.val(cartStr);
+            formWidget.addSubmitCallback(function(){
+                $('#order_json').val(JSON.stringify(cart));
+                return true;
             });
         });
     </script>

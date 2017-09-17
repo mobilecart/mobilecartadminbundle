@@ -52,6 +52,8 @@
         },
         render: function() {
             var total = this.model.toJSON();
+            var value = parseFloat(total.value);
+            total.value = value.formatMoney(2);
             this.$el.html(this.template(total));
             return this;
         }

@@ -1,13 +1,13 @@
 <ul class="nav nav-tabs">
-    <li class="active">
+    <li class="active tab-products-selected">
         <a href="#section-products-selected" data-toggle="tab" aria-expanded="false">Selected Products</a>
     </li>
-    <li class="">
+    <li class="tab-products-search">
         <a href="#section-products-search" data-toggle="tab" aria-expanded="true">Search</a>
     </li>
 </ul>
 <div class="tab-content">
-    <div id="section-products-selected" class="tab-pane tab-panel fade  active in">
+    <div id="section-products-selected" class="tab-pane tab-panel fade active in">
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover dataTable">
                 <thead class="selected-grid-header">
@@ -29,12 +29,11 @@
         </div>
     </div>
     <div id="section-products-search" class="tab-pane tab-panel fade">
-
         <div class="panel panel-default adv-filters">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-sm-3">
-                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Basic Filters</a>
+                        <a data-toggle="collapse" data-parent="#accordion" class="pull-left btn btn-default" href="#{{ section_id }}-filters-panel">Filters</a>
                     </div>
                     <div class="col-sm-6">
                         <input type="text" class="form-control search-query" name="q" value="" placeholder="Search..." />
@@ -42,6 +41,9 @@
                     <div class="col-sm-3">
                         <div class="pull-right adv-filters-buttons">
                             <button class="btn btn-default adv-filters-search"><i class="fa fa-search"> </i></button>
+                            <span class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-2x fa-fw margin-bottom"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -52,14 +54,10 @@
                 </div>
             </div>
         </div>
-
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-2">
-
-                    </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
 
                     </div>
                     <div class="col-sm-6" role="group">
@@ -83,5 +81,4 @@
             </div>
         </div>
     </div>
-
 </div>

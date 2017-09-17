@@ -45,9 +45,9 @@
         </div>
         <div class="col-xs-1">
             <% if (remove) { %>
-            <a href="javascript:;" class="remove-filter"><i class="glyphicon glyphicon-remove"> </i></a>
+            <a href="javascript:;" class="btn btn-default remove-filter"><i class="glyphicon glyphicon-remove"> </i></a>
             <% } else { %>
-            <a href="javascript:;" class="add-filter"><i class="glyphicon glyphicon-plus-sign"></i></a>
+            <a href="javascript:;" class="btn btn-default add-filter"><i class="glyphicon glyphicon-plus-sign"></i></a>
             <% } %>
         </div>
     </div>
@@ -89,7 +89,7 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
     model: App.Customer.models.Customer,
     state: {
         pageSize: 30,
-        sortKey: 'first_name',
+        sortKey: 'id',
         order: 1,
         currentPage: 1,
         totalPages: null,
@@ -111,6 +111,17 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
         var response = fullResponse.result;
         var search = fullResponse.search;
         var columns = fullResponse.columns;
+
+        var sortBy = search.sortBy;
+        var sortDir = search.sortDir;
+        for (var x = 0; x < columns.length; x++) {
+            var column = columns[x];
+            if (column.key == sortBy) {
+                columns[x].isActive = 1;
+                columns[x].direction = sortDir;
+                break;
+            }
+        }
 
         // Set state
         this.state.totalRecords = parseInt(response.total);
@@ -142,7 +153,7 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
 
             App.Customer.views.advfilters = new App.Customer.views.GridFilterView({
                 collection: App.Customer.collections.advfilters,
-                el: App.Customer.Container.find('div#customers-filters-container')
+                el: App.Customer.Container.find('div#customer-filters-container')
             });
 
             App.Customer.views.advfilters.ops = search.advFilterOps; // [{code:'gt',label:'Greater Than',types:["number","date"]},..]
@@ -156,6 +167,10 @@ App.Customer.collections.PaginatedCollection = Backbone.PageableCollection.exten
         //App.Customer.collections.facets = new App.Customer.collections.FacetCollection(response.facetCounts);
         //App.Customer.views.facets = new App.Customer.views.FacetCollectionView({collection: App.Customer.collections.facets});
         //App.Customer.views.facets.render();
+
+        var searchBtn = $('div#section-customers button.adv-filters-search');
+        searchBtn.siblings('.spinner').hide();
+        searchBtn.show();
 
         return response.entities;
     }
@@ -199,8 +214,11 @@ App.Customer.views.updateForm = function(customer) {
 
             switch(key) {
                 case 'id':
-                    key = 'customer_id';
-                    input = $('#' + key);
+                    input = $('#customer_id');
+                    value = customer[key];
+                    break;
+                case 'email':
+                    input = $('#email');
                     value = customer[key];
                     break;
                 case 'first_name':
@@ -218,15 +236,12 @@ App.Customer.views.updateForm = function(customer) {
                 continue;
             }
 
-            var inputId = input.attr('id');
-            if (inputId.indexOf(key) > 0) {
-                if (key == 'is_shipping_same') {
-                    if (value == 1) {
-                        input.trigger('click');
-                    }
-                } else {
-                    input.val(value);
+            if (key == 'is_shipping_same') {
+                if (value == 1) {
+                    //input.trigger('click');
                 }
+            } else {
+                input.val(value);
             }
         }
     }
@@ -272,6 +287,21 @@ App.Customer.views.CustomerView = Backbone.View.extend({
         var customerId = customer.get('id');
         var link = $(e.currentTarget);
         var checkbox = $('input#selected-customer-id-' + customerId);
+
+        var selectedTab = $('div#section-customer li.tab-customer-selected');
+        var searchTab = $('div#section-customer li.tab-customer-search');
+        var selectedSection = $('div#section-customer div#section-customer-form');
+        var searchSection = $('div#section-customer div#section-customers');
+
+        searchTab.removeClass('active');
+        searchTab.find('a').attr('aria-expanded', false);
+        selectedTab.addClass('active');
+        selectedTab.find('a').attr('aria-expanded', true);
+
+        searchSection.removeClass('active');
+        searchSection.removeClass('in');
+        selectedSection.addClass('active');
+        selectedSection.addClass('in');
 
         var cartStr = JSON.stringify(cart);
         var customerStr = JSON.stringify(customer.toJSON());
@@ -522,6 +552,10 @@ App.Customer.views.TableButtons = Backbone.View.extend({
     updateSearch: function (e) {
         e.preventDefault();
 
+        var searchBtn = $(e.target);
+        searchBtn.hide();
+        searchBtn.siblings('.spinner').show();
+
         var queryText = App.Customer.Container.find('input.search-query').val();
 
         // filter fields
@@ -672,8 +706,8 @@ App.Customer.views.PaginatedView = Backbone.View.extend({
             el: App.Customer.Container.find('.customer-list')
         });
 
-        {% if customer_id > 0 %}
-        App.Customer.views.customers.selected = {{ customer_id }};
+        {% if entity.get('customer_id') > 0 %}
+        App.Customer.views.customers.selected = {{ entity.get('customer_id') }};
         {% endif %}
 
         // pager controls
@@ -700,5 +734,24 @@ App.Customer.views.PaginatedView = Backbone.View.extend({
             return true;
         });
 
+        var strategyInputEl = App.Customer.Container.find('select[name="customer_strategy"]');
+        var idInputEl = App.Customer.Container.find('input[name="customer_id"]');
+        var passwordInputs = App.Customer.Container.find('.password-inputs');
+
+        strategyInputEl.on('change', function(e){
+            var self = $(this);
+            var value = self.val();
+            if (value == 'existing') {
+                idInputEl.parent().show();
+            } else {
+                idInputEl.parent().hide();
+            }
+
+            if (value == 'new') {
+                passwordInputs.show();
+            } else {
+                passwordInputs.hide();
+            }
+        })
     });
 </script>

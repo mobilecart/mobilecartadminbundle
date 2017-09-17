@@ -57,44 +57,70 @@
             App.Customer.views.updateForm(customer);
 
             cart = aCart;
+            $('#order_json').val(JSON.stringify(cart));
         }
 
         $(function() {
 
-            // hide/show shipping address inputs
-            function toggleShippingSame(checkbox) {
-                $('form .shipping-input').each(function(){
-                    var el = $(this);
-                    if (checkbox.prop('checked')) {
-                        el.hide();
-                        el.siblings().hide();
-                    } else {
-                        el.show();
-                        el.siblings().show();
-                    }
-                });
-            }
-
-            var cartJson = $('#mobilecart_corebundle_order_json');
-
-            var checkbox = $('#mobilecart_corebundle_order_is_shipping_same');
-            checkbox.click(function(e){
-                toggleShippingSame($(this));
-            });
-            toggleShippingSame(checkbox);
-
-            // render tabs
             renderTabs(cart);
 
-            // handle change of shipping address info
-            $('div.admin-form form .shipping-input').change(function(e){
-
+            formWidget.addSubmitCallback(function(){
+                $('#order_json').val(JSON.stringify(cart));
+                return true;
             });
 
-            // handle form submission
-            $('div.admin-form form').submit(function(e){
-                var cartStr = JSON.stringify(cart);
-                cartJson.val(cartStr);
+            formWidget.addSubmitCallback(function(){
+                var isValid = true;
+
+                // validate each customer strategy
+                var emailEl = App.Customer.Container.find('input[name="email"]');
+                if (emailEl.val().length < 5) {
+                    emailEl.parent().addClass('has-error');
+                    isValid = false;
+                } else {
+                    emailEl.parent().removeClass('has-error');
+                }
+
+                var strategyInputEl = App.Customer.Container.find('select[name="customer_strategy"]');
+                switch(strategyInputEl.val()) {
+                    case 'existing':
+
+                        var idInputEl = App.Customer.Container.find('input[name="customer_id"]');
+                        if (idInputEl.val() > 0) {
+                            idInputEl.parent().removeClass('has-error');
+                        } else {
+                            idInputEl.parent().addClass('has-error');
+                            isValid = false;
+                        }
+
+                        break;
+                    case 'guest':
+
+                        break;
+                    case 'new':
+
+                        var passwordEl = App.Customer.Container.find('input[name="customer_password"]');
+                        var passwordConfirmEl = App.Customer.Container.find('input[name="customer_password_confirm"]');
+
+                        if (passwordEl.val().length >= 6) {
+                            if (passwordEl.val() != passwordConfirmEl.val()) {
+                                passwordEl.parent().addClass('has-error');
+                                passwordConfirmEl.parent().addClass('has-error');
+                                isValid = false;
+                            } else {
+                                passwordEl.parent().removeClass('has-error');
+                                passwordConfirmEl.parent().removeClass('has-error');
+                            }
+                        } else {
+                            passwordEl.parent().addClass('has-error');
+                            passwordConfirmEl.parent().addClass('has-error');
+                            isValid = false;
+                        }
+
+                        break;
+                }
+
+                return isValid;
             });
         });
     </script>

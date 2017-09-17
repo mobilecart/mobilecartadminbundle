@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<orders>
-    {#% if result.entities is defined %#}
-    {% for entity in result.entities %}
-    <order>
-        <name>{{ entity.customer_name }}</name>
-    </order>
-    {% endfor %}
-</orders>
