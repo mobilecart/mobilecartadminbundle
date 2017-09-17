@@ -16,18 +16,13 @@
                     <select class="form-control" name="customer_strategy">
                         <option value="existing" selected="selected">Existing Customer</option>
                         <option value="guest">Guest Order</option>
-                        <option value="new">New Customer</option>
+                        <!-- todo: finish this <option value="new">New Customer</option>-->
                     </select>
                 </div>
                 {% endif %}
 
                 <div class="form-group">
-                    <label class="control-label">Customer ID{% if entity.get('customer_id') > 0 %} <a href="{{ path('cart_admin_customer_edit', {'id': entity.get('customer_id')}) }}" target="_blank">View</a>{% endif %}</label>
-                    <input {% if entity.get('id') > 0 %}readonly{% endif %} class="form-control" type="number" name="customer_id" id="customer_id" value="{% if entity.get('customer_id') > 0 %}{{ entity.get('customer_id') }}{% endif %}" />
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label">Email</label>
+                    <label class="control-label">Email{% if entity.get('customer_id') > 0 %} - <a href="{{ path('cart_admin_customer_edit', {'id': entity.get('customer_id')}) }}">view customer</a>{% endif %}</label>
                     <input {% if entity.get('id') > 0 %}readonly{% endif %} class="form-control" type="text" name="email" id="email" value="{{ entity.get('email') }}" />
                 </div>
 
@@ -46,6 +41,11 @@
                 {% for field in form_elements %}
                     {{ form_row(form.offsetGet(field)) }}
                 {% endfor %}
+
+                <div class="form-group">
+                    <label class="control-label">Customer ID</label>
+                    <input {% if entity.get('id') > 0 %}readonly{% endif %} class="form-control" type="number" name="customer_id" id="customer_id" value="{% if entity.get('customer_id') > 0 %}{{ entity.get('customer_id') }}{% endif %}" />
+                </div>
             </div>
         </div>
     </div>

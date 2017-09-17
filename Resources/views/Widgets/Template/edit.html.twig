@@ -68,6 +68,20 @@
                                             {% for field in sectionData.fields %}
                                                 {{ form_row(form.offsetGet(field)) }}
                                             {% endfor %}
+
+                                            {% if sectionData.custom_sections is defined %}
+                                            <div class="custom-sections">
+                                                {% for customSection, customSectionData in sectionData.custom_sections %}
+                                                    <div class="custom-section custom-section-{{ section }}-{{ customSection }}">
+                                                    {% if customSectionData.form is defined %}
+                                                        {{ form_widget(customSectionData.form) }}
+                                                    {% else %}
+                                                        {% include customSection.template with customSectionData %}
+                                                    {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -152,4 +166,5 @@
             {% include sectionData.js_template with sectionData %}
         {% endif %}
     {% endfor %}
+
 {% endblock %}

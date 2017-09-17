@@ -1,0 +1,28 @@
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
+{% block header_text %}Create Payment{% endblock %}
+{% block back_button %}
+    <a href="{{ renderGridBackUrl('cart_admin_order_payment') }}" class="btn btn-default">Back</a>
+    <a href="{{ path('cart_admin_order_edit', {'id':app.request.get('order_id') }) }}" class="btn btn-default">Edit Order</a>
+{% endblock %}
+{#% block javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        $(function() {
+            var selectEl = $('select#order_payment_code');
+            showForm(selectEl.val());
+
+            selectEl.on('change', function(e) {
+                var self = $(this);
+                var code = self.val();
+                showForm(code);
+            });
+
+            function showForm(code) {
+                $('div.custom-sections div.custom-section').hide();
+                $('#' + code).parent().show();
+            }
+        });
+    </script>
+
+{% endblock %#}

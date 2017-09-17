@@ -630,7 +630,7 @@ App.Discount.views.TableHeading = Backbone.View.extend({
         var self = this;
         this.$el.html('');
 
-        var html = '<th>&nsbp;</th>';
+        var html = '<th>&nbsp;</th>';
 
         this.collection.each(function(cell) {
             if (self.columns.indexOf(cell.get('key')) >= 0) {

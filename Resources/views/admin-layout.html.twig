@@ -46,6 +46,20 @@
     <script src="{{ asset('bundles/mobilecartadmin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartadmin/js/global.js') }}"></script>
 
+    {% if javascripts is defined %}
+    {% for javascript in javascripts %}
+        {% if javascript.url is defined %}
+            <script type="text/javascript" src="{{ javascript.url }}"></script>
+        {% elseif javascript.asset is defined %}
+            <script src="{{ asset(javascript.asset) }}" type="text/javascript"></script>
+        {% elseif javascript.js_template is defined and javascript.data is defined %}
+            {% include javascript.js_template with javascript.data %}
+        {% elseif javascript.js_template is defined %}
+            {% include javascript.js_template %}
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+
 {% endblock %}
 
 {% block body %}
@@ -118,6 +132,7 @@
                 <ul class="nav nav-second-level">
                     <li><a href="{{ path('cart_admin_order') }}">Orders</a></li>
                     <li><a href="{{ path('cart_admin_order_item') }}">Order Items</a></li>
+                    <li><a href="{{ path('cart_admin_order_payment') }}">Payments</a></li>
                     <li><a href="{{ path('cart_admin_order_shipment') }}">Shipments</a></li>
                     <li><a href="{{ path('cart_admin_discount') }}">Discounts</a></li>
                     <li><a href="{{ path('cart_admin_shipping_method') }}">Shipping Methods</a></li>

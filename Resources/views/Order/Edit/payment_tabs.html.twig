@@ -2,8 +2,8 @@
     <li class="active">
         <a href="#section-payments" data-toggle="tab" aria-expanded="false">Payments</a>
     </li>
-    <li class="">
-        <a href="#section-add-payment" data-toggle="tab" aria-expanded="true">Add Payments</a>
+    <li>
+        <a class="btn btn-success" href="{{ path('cart_admin_order_payment_new', {'order_id': entity.id }) }}">Create</a>
     </li>
 </ul>
 <div class="tab-content">
@@ -28,29 +28,5 @@
             {% endfor %}
             </table>
         </div>
-    </div>
-    <div id="section-add-payment" class="tab-pane tab-panel fade">
-
-        <div class="payment-option">
-            <div class="payment-option-selector">
-                <label>No Payment</label>
-                <input type="radio" class="payment-option-input" name="payment_method" value="" />
-            </div>
-        </div>
-
-    {% for method in payment_methods %}
-        <div class="payment-option">
-            <div class="payment-option-selector">
-                <label>{{ method.label }}</label>
-                <input type="radio" class="payment-option-input" name="payment_method" value="{{ method.code }}" />
-            </div>
-            <div class="payment-option-form" style="display: none;">
-                {# dont break main form with more form tags, markup #}
-                {{ form_widget(method.getForm()) }}
-            </div>
-        </div>
-
-    {% endfor %}
-
     </div>
 </div>
