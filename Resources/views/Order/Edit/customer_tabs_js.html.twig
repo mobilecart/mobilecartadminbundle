@@ -11,7 +11,7 @@
 <script type="text/html" id="customer-pagination-template">
     <button type="button" class="prev btn-default btn <% if (currentPage == 1) { %> disabled <% } %>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></button>
     <input type="number" value="<%= currentPage %>" name="page" id="product-page" class="form-control number paginator">
-    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= lastPage) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
+    <button type="button" class="btn btn-default pull-right next <% if (currentPage >= totalPages) { %> disabled <% } %>" aria-label="Next"><span aria-hidden="true">&raquo;</span></button>
 </script>
 
 <script type="text/html" id="customer-grid-adv-filter">
