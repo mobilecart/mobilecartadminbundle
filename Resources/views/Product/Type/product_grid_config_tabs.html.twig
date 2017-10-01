@@ -12,16 +12,18 @@
 </ul>
 <div class="tab-content">
     <div id="section-options" class="tab-pane fade active in">
+        {% if vars|length > 0 %}
         <select name="config_vars[]" class="form-control" multiple="multiple">
             {% for code, var in vars %}
                 <option value="{{ code }}"{% if var.checked is defined %} selected="selected"{% endif %}>{{ var.name }}</option>
             {% endfor %}
         </select>
+        {% else %}
+        <p>There are no Custom Fields configured.</p>
+        {% endif %}
     </div>
     <div id="section-products" class="tab-pane fade">
-
         <div class="panel panel-default">
-
             <div class="panel-body listing-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover dataTable">
@@ -53,7 +55,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <div id="section-search" class="tab-pane fade">
 
