@@ -4,6 +4,9 @@ var ConditionWidget = function(info) {
     this.containerEl = info.containerEl;
     this.operators = info.operators;
     this.logicalOperators = info.logicalOperators;
+    if (typeof info.targetLogicalOperators != 'undefined') {
+        this.targetLogicalOperators = info.targetLogicalOperators;
+    }
     this.containerOperators = info.containerOperators;
     this.varSets = info.varSets;
     this.conditionInput = info.conditionInput;
@@ -46,6 +49,7 @@ ConditionWidget.prototype = {
     operators: {},
     containerOperators: {},
     logicalOperators: {},
+    targetLogicalOperators: null,
     varSets: {},
     currentVarSet: {},
     conditionInput: {},
@@ -376,6 +380,12 @@ ConditionWidget.prototype = {
 
         // ensure entity_type is valid, and following the intended widget behavior
         //  which is to only allow product|customer|shipment at the 2nd level
+
+        if (_.isUndefined(condition.entity_type)) {
+            condition.entity_type = '';
+            condition.entity_field = '';
+        }
+
         // todo : factor this out when I have time
         if (condition.entity_type.length == 0 && !_.isUndefined(liEl)) {
             var compareEl = liEl.find('select.compare-operator');
@@ -435,7 +445,7 @@ ConditionWidget.prototype = {
         return html;
     },
 
-    buildCompareControl: function(el, compareObj) {
+    buildCompareControl: function(el, compareObj, isTarget) {
         // el should be a li element
         var self = this;
         var html = '<div class="condition-comparison">';
@@ -455,7 +465,11 @@ ConditionWidget.prototype = {
         if (enableContainerOps && typeof self.containerOperators != 'undefined') {
             html += this.buildSelectGeneric(self.containerOperators, 'compare-operator', operator);
         } else {
-            html += this.buildSelectGeneric(self.logicalOperators, 'compare-operator', operator);
+            if (isTarget && self.targetLogicalOperators != null) {
+                html += this.buildSelectGeneric(self.targetLogicalOperators, 'compare-operator', operator);
+            } else {
+                html += this.buildSelectGeneric(self.logicalOperators, 'compare-operator', operator);
+            }
         }
 
         html += '</div>';
@@ -553,18 +567,18 @@ ConditionWidget.prototype = {
     },
 
     populateConditionsWidget: function(conditionsObj, targetObj) {
-        this.populateCompareTree($(this.containerEl.find('li.root.conditions')), conditionsObj, 1);
-        this.populateCompareTree($(this.containerEl.find('li.root.actions')), targetObj, 1);
+        this.populateCompareTree($(this.containerEl.find('li.root.conditions')), conditionsObj, 1, false);
+        this.populateCompareTree($(this.containerEl.find('li.root.actions')), targetObj, 1, true);
     },
 
-    populateCompareTree: function(el, compareObj, depth) {
+    populateCompareTree: function(el, compareObj, depth, isTarget) {
         var self = this;
 
         if (compareObj.hasOwnProperty('conditions')) {
             // add the div and ul elements to the container
             //  the div is for the logical operators: and, or, product, shipment, customer
             //  the ul is for the conditions, condition-compares
-            el.append(this.buildCompareControl(el, compareObj) + this.buildConditionsContainer(false));
+            el.append(this.buildCompareControl(el, compareObj, isTarget) + this.buildConditionsContainer(false));
 
             // ul element from conditions container . this is created in the previous lines
             var cEl = el.find('ul.compare-conditions');
@@ -590,7 +604,7 @@ ConditionWidget.prototype = {
             cEl.append('<li>' + this.buildAddLinks(depth) + '</li>');
         } else if (el.hasClass('root')) {
             // if we're populating with an empty object, just populate the first part , with links
-            el.append(this.buildCompareControl(el, compareObj) + this.buildConditionsContainer(true));
+            el.append(this.buildCompareControl(el, compareObj, isTarget) + this.buildConditionsContainer(true));
         }
 
         return true;

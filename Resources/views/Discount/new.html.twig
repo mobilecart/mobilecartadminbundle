@@ -20,11 +20,12 @@
                 conditionInput: $('{{ condition_input }}'),
                 operators: {{ operators_json|raw }},
                 logicalOperators: {{ logical_operators_json|raw }},
+                targetLogicalOperators: {{ target_logical_operators_json|raw }},
                 containerOperators: {{ container_operators_json|raw }},
                 varSets: {{ var_sets|raw }}
             });
 
-            $('#form-submit').click(function(e) {
+            formWidget.addSubmitCallback(function(){
                 widget.serialize();
                 return true;
             });
