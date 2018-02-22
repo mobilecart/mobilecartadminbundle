@@ -30,14 +30,24 @@
                 return true;
             });
 
-            $('#discount_applied_to').on('change', function(e){
-                var self = $(this);
-                if (self.val() == 'specified') {
-                    $('ul.builder').parent().show();
+            var appliedToEl = $('#discount_applied_to');
+            var builderEl = $('ul.builder');
+
+            function updateAppliedTo() {
+                if (appliedToEl.val() == 'specified') {
+                    builderEl.each(function(){
+                        $(this).parent().show();
+                    });
                 } else {
-                    $('ul.builder').parent().hide();
+                    builderEl.each(function(){
+                        $(this).parent().hide();
+                    });
                 }
-            });
+                return true;
+            }
+
+            appliedToEl.on('change', updateAppliedTo);
+            updateAppliedTo();
         });
     </script>
 {% endblock %}
