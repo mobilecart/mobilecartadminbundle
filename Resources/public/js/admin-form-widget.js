@@ -57,15 +57,12 @@ AdminFormWidget.prototype = {
         widget.buttonEl.siblings('.spinner').show();
 
         var formAction = formEl.attr('action');
-        var actionSep = '?';
-        if (formAction.indexOf('?') > 0) {
-            actionSep = '&';
-        }
 
         $.ajax({
             type: 'POST',
-            url: formAction + actionSep + 'format=json',
+            url: formAction,
             data: formEl.serialize(),
+            headers: { 'Accept': 'application/json' },
             dataType: 'json',
             success: function(response) {
 
