@@ -3,9 +3,9 @@
 {% block stylesheets %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ asset('bundles/mobilecartadmin/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('bundles/mobilecartadmin/fonts/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('bundles/mobilecartadmin/css/styles.css') }}" rel="stylesheet">
+    <link href="{{ asset(adminAsset('css/bootstrap.min.css')) }}" rel="stylesheet">
+    <link href="{{ asset(adminAsset('fonts/font-awesome/css/font-awesome.min.css')) }}" rel="stylesheet">
+    <link href="{{ asset(adminAsset('css/styles.css')) }}" rel="stylesheet">
 {% endblock %}
 
 {% block javascripts %}
@@ -35,16 +35,16 @@
         App.views.dynamic = {};
         App.serverURL = '{{ path('_home') }}';
     </script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/json2.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/jquery-1.12.4.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/spin.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/underscore.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/backbone-min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/backbone.localStorage.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/backbone.paginator.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/plugins/metisMenu/jquery.metisMenu.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartadmin/js/global.js') }}"></script>
+    <script src="{{ asset(adminAsset('js/json2.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/jquery-1.12.4.min.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/spin.min.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/underscore.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/backbone-min.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/backbone.localStorage.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/backbone.paginator.min.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/bootstrap.min.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/plugins/metisMenu/jquery.metisMenu.js')) }}"></script>
+    <script src="{{ asset(adminAsset('js/global.js')) }}"></script>
 
     {% if javascripts is defined %}
     {% for javascript in javascripts %}
@@ -183,6 +183,4 @@
     <!-- /.row -->
 </div>
 <!-- /#page-wrapper -->
-
-
 {% endblock %}

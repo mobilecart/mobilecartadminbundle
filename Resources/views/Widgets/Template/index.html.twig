@@ -112,11 +112,11 @@
                     {% if search.advFilters is defined and search.advFilters|length > 0 %}
                         {% for advfilter in search.advFilters %}
                             {% set currentType = 'number' %}
-                            <div class="filter row">
+                            <div class="filter row existing">
                                 <div class="col-xs-4">
                                     <select name="filter_field[{{ counter }}]" class="form-control adv-filter-field">
                                     {% for obj in search.filterable %}
-                                        <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}{% if obj.code == advfilter.field %}{% set currentType = obj.type %} selected="selected"{% endif %}>{{ obj.label }}</option>
+                                        <option value="{{ obj.code }}" data-type="{{ obj.datatype }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}{% if obj.code == advfilter.field %}{% set currentType = obj.datatype %} selected="selected"{% endif %}>{{ obj.label }}</option>
                                     {% endfor %}
                                     </select>
                                 </div>
@@ -144,15 +144,19 @@
                             <div class="filter row">
                                 <div class="col-xs-4">
                                     <select name="filter_field[{{ counter }}]" class="form-control adv-filter-field">
+                                    {% set firstType = '' %}
                                     {% for obj in search.filterable %}
-                                        <option value="{{ obj.code }}" data-type="{{ obj.type }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}>{{ obj.label }}</option>
+                                        {% if firstType == '' %}
+                                            {% set firstType = obj.datatype %}
+                                        {% endif %}
+                                        <option value="{{ obj.code }}" data-type="{{ obj.datatype }}"{% if obj.choices is defined %} data-choices='{"choices":{{ obj.choices|json_encode()|raw }}}'{% endif %}>{{ obj.label }}</option>
                                     {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-xs-4">
                                     <select name="filter_op[{{ counter }}]" class="form-control adv-filter-op">
                                     {% for advfilterop in search.advfilterops %}
-                                        {% if 'number' in advfilterop.types %}
+                                        {% if firstType in advfilterop.types %}
                                         <option value="{{ advfilterop.code }}" data-types='{"types":{{ advfilterop.types|json_encode()|raw }}}'>{{ advfilterop.label }}</option>
                                         {% endif %}
                                     {% endfor %}
@@ -196,25 +200,10 @@
                                 </div>
                             </div>
                             <div class="col-xs-4">
-                                {#
-                                <div class="btn-group pull-left" role="group">
-                                    <button type="button" data-target="#modal-shared" data-toggle="modal" class="btn btn-default mass-action-trash" data-action="mass_delete">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </button>
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                                    </button>
-                                    <ul class="dropdown-menu export-menu" role="menu">
-                                    {% for key, label in search.formats if key != 'html' %}
-                                        <li><a href="javascript:;" class="export" data-format="{{ key }}">Export {{ label }}</a></li>
-                                    {% endfor %}
-                                    </ul>
-                                </div>
-                                #}
+
                             </div>
                             <div class="col-xs-6 pull-right">
                                 <div class="pull-right btn-group input-group paginator" role="group">
-                                    {#{{ renderPager(getPages(result.pages, search.page), search.page) }}#}
                                     <button type="button" class="btn pull-left btn-default prev {% if search.page == 1 %}disabled{% endif %}" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </button>
@@ -285,7 +274,6 @@
         <input type="hidden" id="sort-by" name="{{ search.sortbyparam }}" value="{{ search.sortby }}" />
         <input type="hidden" id="sort-dir" name="{{ search.sortdirparam }}" value="{{ search.sortdir }}" />
         <input type="hidden" id="page-size" name="{{ search.limitParam }}" value="{{ search.limit }}" />
-        <!-- <input type="hidden" id="format" name="format" value="html" /> -->
 
     </form>
 
@@ -318,8 +306,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% set counter = search.advFilters|length + 1 %}
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/GridFilterWidget.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/ModalWidget.js') }}"></script>
+    <script type="text/javascript" src="{{ asset(adminAsset('js/grid-filter-widget.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(adminAsset('js/modal-widget.js')) }}"></script>
     <script type="text/javascript">
         $(function(){
 

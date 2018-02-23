@@ -100,7 +100,7 @@ GridFilterWidget.prototype = {
                     if (_.isObject(inputEl)) {
                         var inputParent = inputEl.parent();
                         inputEl.remove();
-                        inputParent.html('<input type="text" class="adv-filter-input" name="' + inputEl.attr('name') + '" value="" />');
+                        inputParent.html('<input type="text" class="adv-filter-input form-control" name="' + inputEl.attr('name') + '" value="" />');
 
                     }
                 }
