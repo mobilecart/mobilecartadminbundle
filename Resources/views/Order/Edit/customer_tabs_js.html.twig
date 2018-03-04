@@ -3,8 +3,8 @@
         <input type="radio" name="select_customer_id" class="select-customer" id="customer-<%- id %>" <% if (checked == 1) { %> checked="checked"<% } %> />
     </td>
     <td><%- id %></td>
-    <td><%- first_name %></td>
-    <td><%- last_name %></td>
+    <td><%- billing_firstname %></td>
+    <td><%- billing_lastname %></td>
     <td><%- email %></td>
 </script>
 
@@ -220,10 +220,6 @@ App.Customer.views.updateForm = function(customer) {
                 case 'email':
                     input = $('#email');
                     value = customer[key];
-                    break;
-                case 'first_name':
-                    value = customer[key] + ' ' + customer['last_name'];
-                    input = $('#order_billing_name');
                     break;
                 default:
                     //no-op
@@ -590,7 +586,7 @@ App.Customer.views.TableButtons = Backbone.View.extend({
 App.Customer.views.TableHeading = Backbone.View.extend({
     el : 'table thead.grid-header',
     tagName: 'tr',
-    columns: ['id','first_name','last_name','email'],
+    columns: ['id','billing_firstname','billing_lastname','email'],
     events: {
         'click th': 'gotoPage',
         'click button.adv-filters-search': 'updateSearch'

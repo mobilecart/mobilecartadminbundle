@@ -42,6 +42,18 @@
     <script src="{{ asset(adminAsset('js/backbone-min.js')) }}"></script>
     <script src="{{ asset(adminAsset('js/backbone.localStorage.js')) }}"></script>
     <script src="{{ asset(adminAsset('js/backbone.paginator.min.js')) }}"></script>
+    <script type="text/javascript">
+
+        Backbone.ajax = function() {
+
+            arguments[0].headers = {
+                'Accept': "application/json"
+            };
+
+            return Backbone.$.ajax.apply(Backbone.$, arguments);
+        };
+
+    </script>
     <script src="{{ asset(adminAsset('js/bootstrap.min.js')) }}"></script>
     <script src="{{ asset(adminAsset('js/plugins/metisMenu/jquery.metisMenu.js')) }}"></script>
     <script src="{{ asset(adminAsset('js/global.js')) }}"></script>

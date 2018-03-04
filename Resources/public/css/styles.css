@@ -553,6 +553,10 @@ div.listing-body {
     border: none;
 }
 
+div.listing-panel {
+    margin-bottom: 0;
+}
+
 div.tab-panel {
     border-top-color: #fff;
     border-right-color: #fff;
@@ -600,3 +604,14 @@ a.slot-toggle span.input-group-btn {
     padding: 0;
 }
 
+td.col-checkbox {
+    width: 50px;
+}
+
+td.col-actions {
+    width: 100px;
+}
+
+td.col-id {
+    width: 60px;
+}

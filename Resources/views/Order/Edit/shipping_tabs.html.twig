@@ -25,9 +25,8 @@
                     <td>
                         <a class="btn btn-default" href="{{ path('cart_admin_order_shipment_edit', {'id': shipment.id }) }}">Edit</a>
                     </td>
-                    <td>{{ shipment.name }}
-                        <br>{{ shipment.street }}
-                        {% if shipment.street2|length >0 %}<br>{{ shipment.street2 }}{% endif %}
+                    <td>{{ shipment.firstname }} {{ shipment.lastname }}
+                        <br>{{ shipment.street }} {{ shipment.street2 }}
                         <br>{{ shipment.city }}, {{ shipment.region }} {{ shipment.postcode }}
                         <br>{{ shipment.countryid }}
                     </td>

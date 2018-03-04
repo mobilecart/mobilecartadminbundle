@@ -112,9 +112,15 @@ App.Category.collections.PaginatedCollection = Backbone.PageableCollection.exten
             "1": 'desc'
         },
         currentPage: 'page',
-        format: 'json',
+        //format: 'json',
         q: ''
     },
+    // sync: function(method, model, options){
+    //     options.beforeSend = function(xhr) {
+    //         xhr.setRequestHeader('Accept', 'application/json');
+    //         return Backbone.sync(method, model, options);
+    //     }
+    // },
     parse: function(fullResponse) {
 
         var response = fullResponse.result;
