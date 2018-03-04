@@ -1,0 +1,6 @@
+{% extends templatePath('Widgets/Template:edit.html.twig', 'admin') %}
+{% block header_text %}Edit Admin User{% endblock %}
+{% block subheader_text %}{{ entity.email }}{% endblock %}
+{% block back_button %}
+    <a href="{{ renderGridBackUrl('cart_admin_admin_user') }}" class="btn btn-default">Back</a>
+{% endblock %}

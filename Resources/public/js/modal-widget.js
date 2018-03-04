@@ -110,7 +110,7 @@ ModalWidget.prototype = {
             type: "POST",
             url: url,
             data: {
-                item_ids: ids,
+                ids: ids,
                 var_code: widget.action,
                 value: value
             },
