@@ -11,8 +11,8 @@
 {% endblock %}
 {% block javascripts %}
 {{ parent() }}
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/lib/wysiwyg/wysiwyg.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/lib/wysiwyg/wysiwyg-editor.js') }}"></script>
+    <script type="text/javascript" src="{{ asset(adminAsset('lib/wysiwyg/wysiwyg.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(adminAsset('lib/wysiwyg/wysiwyg-editor.js')) }}"></script>
     <script type="text/javascript">
         $(function(){
 
@@ -297,5 +297,5 @@
 {% endblock %}
 {% block stylesheets %}
 {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('bundles/mobilecartadmin/lib/wysiwyg/wysiwyg-editor.css') }}" />
+    <link rel="stylesheet" href="{{ asset(adminAsset('lib/wysiwyg/wysiwyg-editor.css')) }}" />
 {% endblock %}

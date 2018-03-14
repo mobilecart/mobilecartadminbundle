@@ -2,8 +2,8 @@
 {% block header_text %}Custom Field Options{% endblock %}
 {% block form_action %}{{ path('cart_admin_item_var_option') }}{% endblock %}
 {% block header_buttons %}
-    <a class="btn btn-success" href="{{ path('cart_admin_item_var_option_new', {'datatype': app.request.get('datatype')}) }}">Create</a>
     {% if app.request.get('item_var_id') > 0 %}
-    <a href="{{ path('cart_admin_item_var') }}" class="btn btn-default">Back</a>
+        <a href="{{ path('cart_admin_item_var') }}" class="btn btn-default">Back</a>
     {% endif %}
+    <a class="btn btn-success" href="{{ path('cart_admin_item_var_option_new', {'datatype': app.request.get('datatype')}) }}">Create</a>
 {% endblock %}

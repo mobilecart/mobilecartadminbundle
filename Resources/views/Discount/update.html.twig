@@ -20,11 +20,11 @@
 {% endblock %}
 {% block stylesheets %}
     {{ parent() }}
-    <link href="{{ asset('bundles/mobilecartadmin/css/discount.css') }}" rel="stylesheet">
+    <link href="{{ asset(adminAsset('css/discount.css')) }}" rel="stylesheet">
 {% endblock %}
 {% block javascripts %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartadmin/js/discountWidget.js') }}"></script>
+    <script type="text/javascript" src="{{ asset(adminAsset('js/discountWidget.js')) }}"></script>
     <script type="text/javascript">
         $(function(){
 

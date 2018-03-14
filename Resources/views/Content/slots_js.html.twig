@@ -1,17 +1,17 @@
 <!-- Simditor WYSIWYG -->
-<link href="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/styles/simditor.css') }}" rel="stylesheet" type="text/css" />
-<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/module.min.js') }}"></script>
-<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/uploader.min.js') }}"></script>
-<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/hotkeys.min.js') }}"></script>
-<script src="{{ asset('bundles/mobilecartadmin/lib/simditor-2.3.6/scripts/simditor.min.js') }}"></script>
+<link href="{{ asset(adminAsset('lib/simditor-2.3.6/styles/simditor.css')) }}" rel="stylesheet" type="text/css" />
+<script src="{{ asset(adminAsset('lib/simditor-2.3.6/scripts/module.min.js')) }}"></script>
+<script src="{{ asset(adminAsset('lib/simditor-2.3.6/scripts/uploader.min.js')) }}"></script>
+<script src="{{ asset(adminAsset('lib/simditor-2.3.6/scripts/hotkeys.min.js')) }}"></script>
+<script src="{{ asset(adminAsset('lib/simditor-2.3.6/scripts/simditor.min.js')) }}"></script>
 
 <!-- HTML5 Image Uploader -->
-<link href="{{ asset('bundles/mobilecartadmin/css/html5imageuploader/uploader-style.css') }}" rel="stylesheet" type="text/css" />
-<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/jquery.html5uploader-1.1.js') }}"></script>
-<script src="{{ asset('bundles/mobilecartadmin/js/html5imageuploader/exif.js') }}"></script>
+<link href="{{ asset(adminAsset('css/html5imageuploader/uploader-style.css')) }}" rel="stylesheet" type="text/css" />
+<script src="{{ asset(adminAsset('js/html5imageuploader/jquery.html5uploader-1.1.js')) }}"></script>
+<script src="{{ asset(adminAsset('js/html5imageuploader/exif.js')) }}"></script>
 
 <!-- JQuery Sortable -->
-<script src="{{ asset('bundles/mobilecartadmin/js/jquery-sortable.js') }}"></script>
+<script src="{{ asset(adminAsset('js/jquery-sortable.js')) }}"></script>
 
 <script type="text/html" id="slot-submit-form-tpl">
 
@@ -161,7 +161,7 @@
 
 </script>
 
-<script src="{{ asset('bundles/mobilecartadmin/js/slot-editor.js') }}"></script>
+<script src="{{ asset(adminAsset('js/slot-editor.js')) }}"></script>
 <script type="text/javascript">
 $(function(){
     var slotEditor = new SlotEditor({
